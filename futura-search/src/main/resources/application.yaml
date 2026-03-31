@@ -1,3 +1,6 @@
 spring:
   application:
     name: futura-search
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
