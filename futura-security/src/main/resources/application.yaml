@@ -1,0 +1,14 @@
+jwt:
+  secret: yourSecretKeyHere12345678901234567890
+  expiration: 86400000
+  tokenHeader: Authorization
+spring:
+  application:
+    name: futura-security
+  datasource:
+    url: jdbc:mysql://localhost:3307/mall
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+server:
+  port: 8074
