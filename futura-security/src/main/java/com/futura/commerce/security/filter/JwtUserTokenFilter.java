@@ -1,4 +1,4 @@
-package com.futura.commerce.security.config;
+package com.futura.commerce.security.filter;
 
 import com.futura.commerce.security.service.impl.AdminUserDetailsService;
 import com.futura.commerce.security.util.JwtTokenUtil;
