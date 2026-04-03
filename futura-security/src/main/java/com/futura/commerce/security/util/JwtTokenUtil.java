@@ -63,7 +63,6 @@ public class JwtTokenUtil {
                     .getBody()
                     .getSubject();
         } catch (Exception e) {
-            // malformed or invalid token signature
             return null;
         }
     }
@@ -92,5 +91,19 @@ public class JwtTokenUtil {
         return username != null
                 && username.equals(userDetails.getUsername())
                 && !isTokenExpired(token);
+    }
+
+    /**
+     * Verify token signature and integrity
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
