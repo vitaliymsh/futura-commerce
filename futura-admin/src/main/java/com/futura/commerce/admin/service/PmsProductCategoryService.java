@@ -1,0 +1,21 @@
+package com.futura.commerce.admin.service;
+
+import com.futura.commerce.mbg.model.PmsProductCategory;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Service interface for managing PmsProductCategory
+ *
+ * @author Vitalii
+ */
+public interface PmsProductCategoryService {
+
+    List<PmsProductCategory> findAll();
+
+    Optional<PmsProductCategory> findById(Long id);
+
+    PmsProductCategory save(PmsProductCategory entity);
+
+    void deleteById(Long id);
+}

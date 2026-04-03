@@ -37,6 +37,13 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+        <!-- Security module -->
+        <dependency>
+            <groupId>com.futura.commerce</groupId>
+            <artifactId>futura-security</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Domain entities and repositories -->
         <dependency>
             <groupId>com.futura.commerce</groupId>
