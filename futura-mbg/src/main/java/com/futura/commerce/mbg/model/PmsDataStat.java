@@ -21,8 +21,10 @@ public class PmsDataStat implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private LocalDate statDate;
     private BigDecimal salesAmount;
     private Integer orderCount;
     private Integer userCount;
+    private Integer productCount;
 }

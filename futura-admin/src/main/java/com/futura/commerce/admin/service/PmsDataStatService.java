@@ -1,11 +1,14 @@
 package com.futura.commerce.admin.service;
 
+import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.PmsDataStat;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
- * Service interface for managing PmsDataStat
+ * Service interface for platform statistics and analytics
  *
  * @author Vitalii
  */
@@ -18,4 +21,9 @@ public interface PmsDataStatService {
     PmsDataStat save(PmsDataStat entity);
 
     void deleteById(Long id);
+
+    /**
+     * Retrieve aggregated user and sales dashboard metrics for date range
+     */
+    CommonResult<Map<String, Object>> selectUserDashboard(String startDate, String endDate);
 }
