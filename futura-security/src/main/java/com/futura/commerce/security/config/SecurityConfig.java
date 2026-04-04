@@ -51,9 +51,9 @@ public class SecurityConfig {
                 // 3. route permission rules
                 .authorizeHttpRequests(auth -> auth
                         // allow login endpoint
-                        .requestMatchers("/login").permitAll()
-                        // allow swagger api documentation
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
+                        // allow swagger api documentation and webjars
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**").permitAll()
                         // all other endpoints require authentication
                         .anyRequest().authenticated())
                 // 4. register jwt filter
