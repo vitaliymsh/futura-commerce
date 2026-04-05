@@ -106,4 +106,23 @@ public class JwtTokenUtil {
             return false;
         }
     }
+
+    /**
+     * Refresh existing valid token
+     */
+    public String refreshToken(String token) {
+        try {
+            if (!validateToken(token)) {
+                return null;
+            }
+            String username = getUsernameFromToken(token);
+            if (username == null) {
+                return null;
+            }
+            Map<String, Object> claims = new HashMap<>();
+            return createToken(claims, username);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Vitalii
  */
 @Configuration
-public class SwaggerConfig extends BaseSwaggerConfig {
+public class SecuritySwaggerConfig extends BaseSwaggerConfig {
 
     @Bean
     public GroupedOpenApi securityGroupedOpenApi() {

@@ -66,6 +66,14 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
                 );
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        // 5. auto-refresh token and attach to response header
+        String newToken = jwtTokenUtil.refreshToken(token);
+        if (newToken != null) {
+            response.setHeader("Authorization", "Bearer " + newToken);
+        }
+
+        // 6. continue filter chain
         filterChain.doFilter(request, response);
     }
 }
