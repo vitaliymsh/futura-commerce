@@ -7,14 +7,14 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Domain entity mapping table ums_admin
+ * Domain entity mapping table sms_promotion_recharge
  *
  * @author Vitalii
  */
 @Data
 @Entity
-@Table(name = "ums_admin")
-public class UmsAdmin implements Serializable {
+@Table(name = "sms_promotion_recharge")
+public class SmsPromotionRecharge implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -22,16 +22,12 @@ public class UmsAdmin implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String password;
-    private String nickName;
-    private String avatar;
-    private String phone;
+    private Long adminId;
+    private Long packageId;
+    private BigDecimal amount;
     private Integer status;
-    private Long roleId;
-    private BigDecimal price;
-    private Long promotionQuota;
-    private Long usedPromotionQuota;
+    private LocalDateTime rechargeTime;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private Long quota;
 }

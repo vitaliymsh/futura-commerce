@@ -1,6 +1,10 @@
 package com.futura.commerce.admin.service;
 
 import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.mbg.model.UmsAdmin;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface for administrative user operations
@@ -9,5 +13,15 @@ import com.futura.commerce.common.baseCommon.CommonResult;
  */
 public interface UmsAdminService {
 
+    List<UmsAdmin> findAll();
+
+    Optional<UmsAdmin> findById(Long id);
+
+    UmsAdmin save(UmsAdmin entity);
+
+    void deleteById(Long id);
+
     CommonResult<String> login(String username, String password);
+
+    CommonResult<Long> sum(Long id);
 }
