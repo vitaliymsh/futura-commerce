@@ -1,6 +1,9 @@
 package com.futura.commerce.admin.service;
 
+import com.futura.commerce.admin.dto.CategoryNode;
+import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.PmsProductCategory;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +21,6 @@ public interface PmsProductCategoryService {
     PmsProductCategory save(PmsProductCategory entity);
 
     void deleteById(Long id);
+
+    CommonResult<List<CategoryNode>> getCategoriesList();
 }

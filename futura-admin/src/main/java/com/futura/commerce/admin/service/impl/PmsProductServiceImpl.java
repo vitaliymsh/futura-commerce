@@ -1,6 +1,8 @@
 package com.futura.commerce.admin.service.impl;
 
+import com.futura.commerce.admin.dto.IsPromotionVO;
 import com.futura.commerce.admin.service.PmsProductService;
+import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.repository.PmsProductRepository;
 import jakarta.annotation.Resource;
@@ -40,5 +42,25 @@ public class PmsProductServiceImpl implements PmsProductService {
     @Override
     public void deleteById(Long id) {
         pmsProductRepository.deleteById(id);
+    }
+
+    @Override
+    public CommonResult<String> isOpen(IsPromotionVO promotionVO) {
+        if (promotionVO == null || promotionVO.getProductId() == null) {
+            return CommonResult.failed("Invalid product promotion parameter");
+        }
+
+        Optional<PmsProduct> productOpt = pmsProductRepository.findById(promotionVO.getProductId());
+        if (productOpt.isEmpty()) {
+            return CommonResult.failed("Product not found");
+        }
+
+        PmsProduct product = productOpt.get();
+        product.setIsPromotion(promotionVO.getIsPromotion());
+        pmsProductRepository.save(product);
+
+        return Integer.valueOf(1).equals(promotionVO.getIsPromotion())
+                ? CommonResult.success("Product promotion enabled")
+                : CommonResult.success("Product promotion disabled");
     }
 }

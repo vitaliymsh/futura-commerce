@@ -52,6 +52,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // allow login endpoint
                         .requestMatchers("/auth/login").permitAll()
+                        // allow static image / avatar access
+                        .requestMatchers("/pic/**").permitAll()
                         // allow swagger api documentation and webjars
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**").permitAll()
                         // all other endpoints require authentication

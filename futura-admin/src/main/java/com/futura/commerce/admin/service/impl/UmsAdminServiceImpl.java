@@ -18,14 +18,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
- * Service implementation for administrative user management and recharge
+ * Service implementation for administrative user management, recharge, and profile
  *
  * @author Vitalii
  */
@@ -97,11 +100,10 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         Long quota = pkg.getPromotionQuota() != null ? pkg.getPromotionQuota() : 0L;
 
         // 2. Extract current admin from security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof LoginUser loginUser)) {
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
             return CommonResult.unauthorized("Authentication required");
         }
-        Long adminId = loginUser.getAdmin().getId();
 
         Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
         if (adminOpt.isEmpty()) {
@@ -136,5 +138,74 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         smsPromotionRechargeService.save(recharge);
 
         return CommonResult.success(currentQuota, "Promotion package recharged successfully");
+    }
+
+    @Override
+    public CommonResult<String> uploadPicture(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return CommonResult.failed("Upload failed: no file provided");
+        }
+        try {
+            String filename = file.getOriginalFilename();
+            String suffix = ".jpg";
+            if (filename != null && filename.contains(".")) {
+                suffix = filename.substring(filename.lastIndexOf("."));
+            }
+            String newFileName = UUID.randomUUID().toString() + suffix;
+
+            // store under standard relative uploads directory
+            String uploadPath = System.getProperty("user.dir") + File.separator + "uploads" + File.separator + "pic" + File.separator;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+
+            File destFile = new File(uploadDir, newFileName);
+            file.transferTo(destFile);
+
+            Long adminId = getCurrentAdminId();
+            if (adminId == null) {
+                return CommonResult.unauthorized("Authentication required");
+            }
+
+            Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
+            if (adminOpt.isEmpty()) {
+                return CommonResult.failed("User account not found");
+            }
+
+            UmsAdmin admin = adminOpt.get();
+            String accessUrl = "/pic/" + newFileName;
+            admin.setAvatar(accessUrl);
+            umsAdminRepository.save(admin);
+
+            return CommonResult.success(accessUrl, "Avatar uploaded successfully");
+        } catch (Exception e) {
+            log.error("Avatar upload failed", e);
+            return CommonResult.failed("Upload failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult<String> getPicture() {
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
+            return CommonResult.unauthorized("Authentication required");
+        }
+
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
+        if (adminOpt.isPresent() && adminOpt.get().getAvatar() != null) {
+            return CommonResult.success(adminOpt.get().getAvatar(), "Avatar retrieved successfully");
+        }
+        return CommonResult.success(null, "No avatar uploaded for this user");
+    }
+
+    private Long getCurrentAdminId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof LoginUser loginUser) {
+            if (loginUser.getAdmin() != null) {
+                return loginUser.getAdmin().getId();
+            }
+        }
+        return null;
     }
 }
