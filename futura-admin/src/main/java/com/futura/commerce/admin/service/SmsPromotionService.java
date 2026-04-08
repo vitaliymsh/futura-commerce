@@ -1,5 +1,6 @@
 package com.futura.commerce.admin.service;
 
+import com.futura.commerce.admin.dto.GoodsQuotaRequestVO;
 import com.futura.commerce.admin.dto.SmsPromotionProductVO;
 import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.SmsPromotion;
@@ -23,4 +24,8 @@ public interface SmsPromotionService {
     void deleteById(Long id);
 
     CommonResult<List<SmsPromotionProductVO>> getPromotionProductList();
+
+    CommonResult<List<SmsPromotionProductVO>> createGoodsQuota(GoodsQuotaRequestVO goodsPromotionVO, Long packageId);
+
+    CommonResult<String> delGoods(List<Long> productIds);
 }
