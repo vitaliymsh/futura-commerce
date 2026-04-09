@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ public class Pms_PromotionController {
      * Enable or disable product promotion status
      */
     @PostMapping("/is_open")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
     @Operation(summary = "Toggle product promotion status", description = "Switch promotion status on or off for a product")
     public CommonResult<String> isOpen(@RequestBody IsPromotionVO promotionVO) {
         return pmsProductService.isOpen(promotionVO);

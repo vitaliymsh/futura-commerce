@@ -5,6 +5,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Domain entity mapping table ums_admin
@@ -34,4 +35,10 @@ public class UmsAdmin implements Serializable {
     private Long usedPromotionQuota;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    @Transient
+    private String roleName;
+
+    @Transient
+    private List<String> permissionList;
 }

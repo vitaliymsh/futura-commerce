@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,7 @@ public class Pms_ProductCategoryController {
      * Get 3-level product category hierarchy tree
      */
     @GetMapping("/categories")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
     @Operation(summary = "Get category tree hierarchy", description = "Returns 3-level category tree with attached products")
     public CommonResult<List<CategoryNode>> categories() {
         return pmsProductCategoryService.getCategoriesList();

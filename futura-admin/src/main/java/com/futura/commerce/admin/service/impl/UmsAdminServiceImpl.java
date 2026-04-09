@@ -1,13 +1,16 @@
 package com.futura.commerce.admin.service.impl;
 
+import com.futura.commerce.admin.dto.UmsAdminRoleDTO;
+import com.futura.commerce.admin.dto.UmsAdminSaveDTO;
 import com.futura.commerce.admin.service.SmsPromotionPackageService;
 import com.futura.commerce.admin.service.SmsPromotionRechargeService;
 import com.futura.commerce.admin.service.UmsAdminService;
 import com.futura.commerce.common.baseCommon.CommonResult;
-import com.futura.commerce.mbg.model.SmsPromotionPackage;
-import com.futura.commerce.mbg.model.SmsPromotionRecharge;
-import com.futura.commerce.mbg.model.UmsAdmin;
+import com.futura.commerce.mbg.model.*;
 import com.futura.commerce.mbg.repository.UmsAdminRepository;
+import com.futura.commerce.mbg.repository.UmsMenuRepository;
+import com.futura.commerce.mbg.repository.UmsRoleMenuRepository;
+import com.futura.commerce.mbg.repository.UmsRoleRepository;
 import com.futura.commerce.security.dto.LoginUser;
 import com.futura.commerce.security.util.JwtTokenUtil;
 import jakarta.annotation.Resource;
@@ -18,11 +21,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,6 +55,15 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Resource
     private SmsPromotionRechargeService smsPromotionRechargeService;
+
+    @Resource
+    private UmsRoleRepository umsRoleRepository;
+
+    @Resource
+    private UmsRoleMenuRepository umsRoleMenuRepository;
+
+    @Resource
+    private UmsMenuRepository umsMenuRepository;
 
     @Override
     public List<UmsAdmin> findAll() {
@@ -197,6 +211,60 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             return CommonResult.success(adminOpt.get().getAvatar(), "Avatar retrieved successfully");
         }
         return CommonResult.success(null, "No avatar uploaded for this user");
+    }
+
+    @Override
+    public CommonResult<List<UmsAdmin>> getUserList() {
+        List<UmsAdmin> list = umsAdminRepository.findAll();
+        for (UmsAdmin umsAdmin : list) {
+            Long roleId = umsAdmin.getRoleId();
+            if (roleId != null) {
+                Optional<UmsRole> roleOpt = umsRoleRepository.findById(roleId);
+                roleOpt.ifPresent(r -> umsAdmin.setRoleName(r.getName()));
+
+                List<UmsRoleMenu> roleMenuList = umsRoleMenuRepository.findByRoleId(roleId);
+                List<String> permissionList = new ArrayList<>();
+                for (UmsRoleMenu rm : roleMenuList) {
+                    if (rm.getMenuId() != null) {
+                        Optional<UmsMenu> menuOpt = umsMenuRepository.findById(rm.getMenuId());
+                        if (menuOpt.isPresent() && StringUtils.hasText(menuOpt.get().getPermission())) {
+                            permissionList.add(menuOpt.get().getPermission());
+                        }
+                    }
+                }
+                umsAdmin.setPermissionList(permissionList);
+            }
+        }
+        return CommonResult.success(list, "User list retrieved successfully");
+    }
+
+    @Override
+    public List<UmsAdminRoleDTO> getRoleListWithPermission() {
+        List<UmsRole> roleList = umsRoleRepository.findAll();
+        List<UmsAdminRoleDTO> result = new ArrayList<>();
+        for (UmsRole role : roleList) {
+            UmsAdminRoleDTO dto = new UmsAdminRoleDTO();
+            dto.setRoleId(role.getId());
+            dto.setName(role.getName());
+            result.add(dto);
+        }
+        return result;
+    }
+
+    @Override
+    public CommonResult<UmsAdminSaveDTO> saveById(UmsAdminSaveDTO umsAdminSaveDto) {
+        if (umsAdminSaveDto == null || umsAdminSaveDto.getId() == null) {
+            return CommonResult.failed("Parameters cannot be empty");
+        }
+        Long adminId = umsAdminSaveDto.getId();
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
+        if (adminOpt.isEmpty()) {
+            return CommonResult.failed("User not found");
+        }
+        UmsAdmin admin = adminOpt.get();
+        admin.setRoleId(umsAdminSaveDto.getRoleId());
+        umsAdminRepository.save(admin);
+        return CommonResult.success(umsAdminSaveDto, "Admin role updated successfully");
     }
 
     private Long getCurrentAdminId() {
