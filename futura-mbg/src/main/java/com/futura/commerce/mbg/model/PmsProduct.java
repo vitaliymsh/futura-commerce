@@ -29,5 +29,7 @@ public class PmsProduct implements Serializable {
     private Integer sort;
     private Integer publishStatus;
     private Integer promoteWeight;
+    private Integer isPromotion;
+    private String description;
     private LocalDateTime createTime;
 }

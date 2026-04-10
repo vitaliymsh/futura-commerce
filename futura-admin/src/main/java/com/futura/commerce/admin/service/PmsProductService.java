@@ -1,8 +1,12 @@
 package com.futura.commerce.admin.service;
 
-import com.futura.commerce.admin.dto.IsPromotionVO;
+import com.futura.commerce.admin.dto.IsPromotionDTO;
+import com.futura.commerce.admin.dto.PmsPromotionSearchDTO;
+import com.futura.commerce.admin.dto.PmsPromotionVO;
 import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
+import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,5 +26,15 @@ public interface PmsProductService {
 
     void deleteById(Long id);
 
-    CommonResult<String> isOpen(IsPromotionVO promotionVO);
+    CommonResult<String> isOpen(IsPromotionDTO promotionVO);
+
+    CommonResult<List<PmsPromotionVO>> goodsList();
+
+    CommonResult<Page<PmsPromotionVO>> goodsPagination(Integer page, Integer pageSize);
+
+    CommonResult<Page<PmsProduct>> getPromotionByKeySearch(Integer page, Integer pageSize, Integer status, String keySearch, Integer categoryId);
+
+    CommonResult<PmsPromotionSearchDTO> getPromotionSave(PmsPromotionSearchDTO promotion);
+
+    CommonResult<String> upload(MultipartFile file);
 }

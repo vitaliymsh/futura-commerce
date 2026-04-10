@@ -2,6 +2,8 @@ package com.futura.commerce.admin.service.impl;
 
 import com.futura.commerce.admin.dto.UmsAdminRoleDTO;
 import com.futura.commerce.admin.dto.UmsAdminSaveDTO;
+import com.futura.commerce.admin.dto.UmsAdminVO;
+import com.futura.commerce.admin.service.CommonImageService;
 import com.futura.commerce.admin.service.SmsPromotionPackageService;
 import com.futura.commerce.admin.service.SmsPromotionRechargeService;
 import com.futura.commerce.admin.service.UmsAdminService;
@@ -24,13 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Service implementation for administrative user management, recharge, and profile
@@ -64,6 +64,9 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Resource
     private UmsMenuRepository umsMenuRepository;
+
+    @Resource
+    private CommonImageService commonImageService;
 
     @Override
     public List<UmsAdmin> findAll() {
@@ -99,6 +102,24 @@ public class UmsAdminServiceImpl implements UmsAdminService {
             log.error("Login failed for username {}: {}", username, e.getMessage());
             return CommonResult.failed("Invalid username or password");
         }
+    }
+
+    @Override
+    public CommonResult<UmsAdminVO> getAdminById() {
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
+            return CommonResult.unauthorized("Authentication required");
+        }
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
+        if (adminOpt.isEmpty()) {
+            return CommonResult.failed("Admin not found");
+        }
+        UmsAdmin admin = adminOpt.get();
+        UmsAdminVO vo = new UmsAdminVO();
+        vo.setPrice(admin.getPrice());
+        vo.setPromotionQuota(admin.getPromotionQuota());
+        vo.setUsedPromotionQuota(admin.getUsedPromotionQuota());
+        return CommonResult.success(vo, "Query successful");
     }
 
     @Override
@@ -156,47 +177,26 @@ public class UmsAdminServiceImpl implements UmsAdminService {
 
     @Override
     public CommonResult<String> uploadPicture(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return CommonResult.failed("Upload failed: no file provided");
+        CommonResult<String> uploadResult = commonImageService.upload(file);
+        if (uploadResult.getCode() == null || uploadResult.getCode() != 200 || uploadResult.getData() == null) {
+            return uploadResult;
         }
-        try {
-            String filename = file.getOriginalFilename();
-            String suffix = ".jpg";
-            if (filename != null && filename.contains(".")) {
-                suffix = filename.substring(filename.lastIndexOf("."));
-            }
-            String newFileName = UUID.randomUUID().toString() + suffix;
 
-            // store under standard relative uploads directory
-            String uploadPath = System.getProperty("user.dir") + File.separator + "uploads" + File.separator + "pic" + File.separator;
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
-
-            File destFile = new File(uploadDir, newFileName);
-            file.transferTo(destFile);
-
-            Long adminId = getCurrentAdminId();
-            if (adminId == null) {
-                return CommonResult.unauthorized("Authentication required");
-            }
-
-            Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
-            if (adminOpt.isEmpty()) {
-                return CommonResult.failed("User account not found");
-            }
-
-            UmsAdmin admin = adminOpt.get();
-            String accessUrl = "/pic/" + newFileName;
-            admin.setAvatar(accessUrl);
-            umsAdminRepository.save(admin);
-
-            return CommonResult.success(accessUrl, "Avatar uploaded successfully");
-        } catch (Exception e) {
-            log.error("Avatar upload failed", e);
-            return CommonResult.failed("Upload failed: " + e.getMessage());
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
+            return CommonResult.unauthorized("Authentication required");
         }
+
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
+        if (adminOpt.isEmpty()) {
+            return CommonResult.failed("User account not found");
+        }
+
+        UmsAdmin admin = adminOpt.get();
+        admin.setAvatar(uploadResult.getData());
+        umsAdminRepository.save(admin);
+
+        return uploadResult;
     }
 
     @Override
