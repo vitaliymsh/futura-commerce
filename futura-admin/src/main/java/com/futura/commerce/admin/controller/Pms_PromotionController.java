@@ -82,4 +82,25 @@ public class Pms_PromotionController {
     public CommonResult<String> upload(@RequestParam("file") MultipartFile file) {
         return promotionService.upload(file);
     }
+
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
+    @Operation(summary = "Delete product")
+    public CommonResult<String> delete(@PathVariable Long id) {
+        return promotionService.delete(id);
+    }
+
+    @PutMapping("/status/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
+    @Operation(summary = "Toggle product publish status")
+    public CommonResult<String> updateStatus(@PathVariable Long id) {
+        return promotionService.updateStatus(id);
+    }
+
+    @PutMapping("/updateProduct/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
+    @Operation(summary = "Update product details")
+    public CommonResult<String> updateProduct(@PathVariable Long id, @RequestBody PmsPromotionSearchDTO promotion) {
+        return promotionService.updateProduct(id, promotion);
+    }
 }

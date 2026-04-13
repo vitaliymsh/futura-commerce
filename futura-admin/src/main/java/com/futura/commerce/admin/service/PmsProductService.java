@@ -37,4 +37,10 @@ public interface PmsProductService {
     CommonResult<PmsPromotionSearchDTO> getPromotionSave(PmsPromotionSearchDTO promotion);
 
     CommonResult<String> upload(MultipartFile file);
+
+    CommonResult<String> delete(Long id);
+
+    CommonResult<String> updateStatus(Long id);
+
+    CommonResult<String> updateProduct(Long id, PmsPromotionSearchDTO promotion);
 }

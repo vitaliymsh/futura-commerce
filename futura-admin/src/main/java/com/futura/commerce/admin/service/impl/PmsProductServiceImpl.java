@@ -190,4 +190,60 @@ public class PmsProductServiceImpl implements PmsProductService {
     public CommonResult<String> upload(MultipartFile file) {
         return commonImageService.upload(file);
     }
+
+    @Override
+    public CommonResult<String> delete(Long id) {
+        if (id == null) {
+            return CommonResult.failed("Invalid product ID");
+        }
+        Optional<PmsProduct> productOpt = pmsProductRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return CommonResult.failed("Product not found");
+        }
+        pmsProductRepository.deleteById(id);
+        return CommonResult.success("Product deleted successfully");
+    }
+
+    @Override
+    public CommonResult<String> updateStatus(Long id) {
+        if (id == null) {
+            return CommonResult.failed("Invalid product ID");
+        }
+        Optional<PmsProduct> productOpt = pmsProductRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return CommonResult.failed("Product not found");
+        }
+        PmsProduct product = productOpt.get();
+        Integer currentStatus = product.getPublishStatus();
+        int newStatus = (currentStatus != null && currentStatus == 1) ? 0 : 1;
+        product.setPublishStatus(newStatus);
+        pmsProductRepository.save(product);
+
+        return CommonResult.success(newStatus == 1 ? "Product published successfully" : "Product unpublished successfully");
+    }
+
+    @Override
+    public CommonResult<String> updateProduct(Long id, PmsPromotionSearchDTO promotion) {
+        if (id == null) {
+            return CommonResult.failed("Invalid product ID");
+        }
+        Optional<PmsProduct> productOpt = pmsProductRepository.findById(id);
+        if (productOpt.isEmpty()) {
+            return CommonResult.failed("Product not found");
+        }
+
+        PmsProduct product = productOpt.get();
+        if (promotion != null) {
+            if (promotion.getName() != null) product.setName(promotion.getName());
+            if (promotion.getCategoryId() != null) product.setCategoryId(promotion.getCategoryId());
+            if (promotion.getPrice() != null) product.setPrice(promotion.getPrice());
+            if (promotion.getStock() != null) product.setStock(promotion.getStock());
+            if (promotion.getPic() != null) product.setPic(promotion.getPic());
+            if (promotion.getPublishStatus() != null) product.setPublishStatus(promotion.getPublishStatus());
+            if (promotion.getDescription() != null) product.setDescription(promotion.getDescription());
+        }
+
+        pmsProductRepository.save(product);
+        return CommonResult.success("Product updated successfully");
+    }
 }
