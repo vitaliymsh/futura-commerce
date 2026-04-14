@@ -40,7 +40,7 @@ public interface PmsProductService {
 
     CommonResult<String> delete(Long id);
 
-    CommonResult<String> updateStatus(Long id);
+    CommonResult<String> updateStatus(Long id, Integer status);
 
     CommonResult<String> updateProduct(Long id, PmsPromotionSearchDTO promotion);
 }

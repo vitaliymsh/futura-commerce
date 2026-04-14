@@ -1,6 +1,18 @@
 spring:
   application:
     name: futura-search
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
+  elasticsearch:
+    uris: http://192.168.1.117:9200
+    connection-timeout: 30s
+    socket-timeout: 30s
+  data:
+    elasticsearch:
+      auto-create-index: false
+      repositories:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.data.elasticsearch: DEBUG
+    co.elastic.clients: DEBUG
+    org.elasticsearch.client: DEBUG

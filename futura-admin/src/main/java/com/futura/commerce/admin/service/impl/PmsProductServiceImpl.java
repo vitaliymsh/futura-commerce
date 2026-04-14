@@ -205,7 +205,7 @@ public class PmsProductServiceImpl implements PmsProductService {
     }
 
     @Override
-    public CommonResult<String> updateStatus(Long id) {
+    public CommonResult<String> updateStatus(Long id, Integer status) {
         if (id == null) {
             return CommonResult.failed("Invalid product ID");
         }
@@ -213,13 +213,14 @@ public class PmsProductServiceImpl implements PmsProductService {
         if (productOpt.isEmpty()) {
             return CommonResult.failed("Product not found");
         }
+        if (status == null || (status != 0 && status != 1)) {
+            return CommonResult.failed("Status must be 0 or 1");
+        }
         PmsProduct product = productOpt.get();
-        Integer currentStatus = product.getPublishStatus();
-        int newStatus = (currentStatus != null && currentStatus == 1) ? 0 : 1;
-        product.setPublishStatus(newStatus);
+        product.setPublishStatus(status);
         pmsProductRepository.save(product);
 
-        return CommonResult.success(newStatus == 1 ? "Product published successfully" : "Product unpublished successfully");
+        return CommonResult.success(status == 1 ? "Product published successfully" : "Product unpublished successfully");
     }
 
     @Override

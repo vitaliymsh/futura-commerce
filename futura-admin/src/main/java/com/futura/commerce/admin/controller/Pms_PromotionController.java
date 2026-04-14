@@ -90,11 +90,11 @@ public class Pms_PromotionController {
         return promotionService.delete(id);
     }
 
-    @PutMapping("/status/{id}")
+    @PutMapping("/status/{id}/{status}")
     @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','promotion:view')")
     @Operation(summary = "Toggle product publish status")
-    public CommonResult<String> updateStatus(@PathVariable Long id) {
-        return promotionService.updateStatus(id);
+    public CommonResult<String> updateStatus(@PathVariable Long id, @PathVariable Integer status) {
+        return promotionService.updateStatus(id, status);
     }
 
     @PutMapping("/updateProduct/{id}")
