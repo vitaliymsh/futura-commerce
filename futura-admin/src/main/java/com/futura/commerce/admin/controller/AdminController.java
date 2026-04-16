@@ -71,4 +71,11 @@ public class AdminController {
     public CommonResult<UmsAdminSaveDTO> save(@RequestBody UmsAdminSaveDTO umsAdminSaveDto) {
         return umsAdminService.saveById(umsAdminSaveDto);
     }
+
+    @PostMapping("/user/search")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage')")
+    @Operation(summary = "Search admin users", description = "Search users by keyword and role")
+    public CommonResult<List<UmsAdmin>> search(@RequestBody com.futura.commerce.admin.vo.UmsAdminSearchVO umsAdminSearchVO) {
+        return umsAdminService.getUserByKeySearch(umsAdminSearchVO);
+    }
 }

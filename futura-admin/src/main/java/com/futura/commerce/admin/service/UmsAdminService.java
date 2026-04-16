@@ -40,4 +40,6 @@ public interface UmsAdminService {
     List<UmsAdminRoleDTO> getRoleListWithPermission();
 
     CommonResult<UmsAdminSaveDTO> saveById(UmsAdminSaveDTO umsAdminSaveDto);
+
+    CommonResult<List<UmsAdmin>> getUserByKeySearch(com.futura.commerce.admin.vo.UmsAdminSearchVO umsAdminSearchVO);
 }

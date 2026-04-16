@@ -267,6 +267,48 @@ public class UmsAdminServiceImpl implements UmsAdminService {
         return CommonResult.success(umsAdminSaveDto, "Admin role updated successfully");
     }
 
+    @Override
+    public CommonResult<List<UmsAdmin>> getUserByKeySearch(com.futura.commerce.admin.vo.UmsAdminSearchVO umsAdminSearchVO) {
+        if (umsAdminSearchVO == null) {
+            return getUserList();
+        }
+
+        Long roleId = umsAdminSearchVO.getRoleId();
+        String roleName = null;
+        if (roleId != null) {
+            Optional<UmsRole> roleOpt = umsRoleRepository.findById(roleId);
+            if (roleOpt.isPresent()) {
+                roleName = roleOpt.get().getName();
+            }
+        }
+
+        final String finalRoleName = roleName;
+        org.springframework.data.jpa.domain.Specification<UmsAdmin> spec = (root, query, cb) -> {
+            List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+            if (umsAdminSearchVO.getKeySearch() != null && !umsAdminSearchVO.getKeySearch().isBlank()) {
+                String pattern = "%" + umsAdminSearchVO.getKeySearch() + "%";
+                jakarta.persistence.criteria.Predicate userPredicate = cb.like(root.get("username"), pattern);
+                jakarta.persistence.criteria.Predicate nickPredicate = cb.like(root.get("nickName"), pattern);
+                jakarta.persistence.criteria.Predicate phonePredicate = cb.like(root.get("phone"), pattern);
+                predicates.add(cb.or(userPredicate, nickPredicate, phonePredicate));
+            }
+
+            if (roleId != null) {
+                predicates.add(cb.equal(root.get("roleId"), roleId));
+            }
+
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+
+        List<UmsAdmin> adminList = umsAdminRepository.findAll(spec);
+        if (finalRoleName != null) {
+            adminList.forEach(a -> a.setRoleName(finalRoleName));
+        }
+
+        return CommonResult.success(adminList, "Query successful");
+    }
+
     private Long getCurrentAdminId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof LoginUser loginUser) {
