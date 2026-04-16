@@ -10,4 +10,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  * @author Vitalii
  */
 public interface PmsProductRepository extends JpaRepository<PmsProduct, Long>, JpaSpecificationExecutor<PmsProduct> {
+    long countByCategoryId(Long categoryId);
 }

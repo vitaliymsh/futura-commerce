@@ -23,4 +23,10 @@ public interface PmsProductCategoryService {
     void deleteById(Long id);
 
     CommonResult<List<CategoryNode>> getCategoriesList();
+
+    CommonResult<String> addCategory(PmsProductCategory category);
+
+    CommonResult<String> updateCategory(Long id, PmsProductCategory category);
+
+    CommonResult<String> deleteCategory(Long id);
 }

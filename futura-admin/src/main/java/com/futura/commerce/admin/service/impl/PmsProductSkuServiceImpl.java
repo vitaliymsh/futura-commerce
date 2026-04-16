@@ -4,11 +4,16 @@ import com.futura.commerce.admin.dto.PmsSkuSearchDTO;
 import com.futura.commerce.admin.service.CommonImageService;
 import com.futura.commerce.admin.service.PmsProductService;
 import com.futura.commerce.admin.service.PmsProductSkuService;
+import com.futura.commerce.common.annotation.OperationLog;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductSku;
+import com.futura.commerce.mbg.model.PmsSkuPriceHistory;
+import com.futura.commerce.mbg.model.SysOperationLog;
 import com.futura.commerce.mbg.repository.PmsProductRepository;
 import com.futura.commerce.mbg.repository.PmsProductSkuRepository;
+import com.futura.commerce.mbg.repository.PmsSkuPriceHistoryRepository;
+import com.futura.commerce.mbg.repository.SysOperationLogRepository;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +51,12 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
 
     @Resource
     private CommonImageService commonImageService;
+
+    @Resource
+    private PmsSkuPriceHistoryRepository pmsSkuPriceHistoryRepository;
+
+    @Resource
+    private SysOperationLogRepository sysOperationLogRepository;
 
     @Override
     public CommonResult<String> updateSku(Long id, List<PmsProductSku> pmsProductSkuList) {
@@ -189,6 +200,7 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
 
     @Override
     @Transactional
+    @OperationLog(module = "SKU", operationType = "CREATE", content = "Add SKU", businessIdParam = "id")
     public CommonResult<String> saveSku(PmsProductSku sku) {
         if (sku == null) {
             return CommonResult.failed("Invalid SKU data");
@@ -210,6 +222,7 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
 
     @Override
     @Transactional
+    @OperationLog(module = "SKU", operationType = "UPDATE", content = "Edit SKU", businessIdParam = "id")
     public CommonResult<String> updateSku(Long id, PmsProductSku sku) {
         if (id == null || sku == null) {
             return CommonResult.failed("Invalid parameters");
@@ -223,6 +236,32 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
             return CommonResult.failed("SKU not found");
         }
 
+        PmsProductSku oldSku = existingOpt.get();
+
+        // Record price history
+        PmsSkuPriceHistory priceHistory = new PmsSkuPriceHistory();
+        priceHistory.setSkuId(id);
+        priceHistory.setSkuCode(sku.getSkuCode() != null ? sku.getSkuCode() : oldSku.getSkuCode());
+        priceHistory.setOldPrice(oldSku.getPrice());
+        priceHistory.setNewPrice(sku.getPrice());
+        priceHistory.setOldCost(oldSku.getCost());
+        priceHistory.setNewCost(sku.getCost());
+        priceHistory.setUpdateTime(LocalDateTime.now());
+        priceHistory.setRemark("Standard price adjustment");
+        priceHistory.setOperator("admin");
+
+        int changeType = 0;
+        if (oldSku.getPrice() != null && sku.getPrice() != null && !oldSku.getPrice().equals(sku.getPrice())
+                && oldSku.getCost() != null && sku.getCost() != null && !oldSku.getCost().equals(sku.getCost())) {
+            changeType = 3;
+        } else if (oldSku.getPrice() != null && sku.getPrice() != null && !oldSku.getPrice().equals(sku.getPrice())) {
+            changeType = 1;
+        } else if (oldSku.getCost() != null && sku.getCost() != null && !oldSku.getCost().equals(sku.getCost())) {
+            changeType = 2;
+        }
+        priceHistory.setChangeType(changeType);
+        pmsSkuPriceHistoryRepository.save(priceHistory);
+
         sku.setId(id);
         sku.setUpdateTime(LocalDateTime.now());
         pmsProductSkuRepository.save(sku);
@@ -233,6 +272,7 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
 
     @Override
     @Transactional
+    @OperationLog(module = "SKU", operationType = "DELETE", content = "Delete SKU")
     public CommonResult<String> deleteSku(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return CommonResult.failed("IDs cannot be empty");
@@ -273,6 +313,8 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
     }
 
     @Override
+    @Transactional
+    @OperationLog(module = "SKU", operationType = "UPDATE", content = "Batch update SKU status")
     public CommonResult<String> batchUpdateStatus(List<Long> ids, Integer status) {
         if (ids == null || ids.isEmpty() || (status != 0 && status != 1)) {
             return CommonResult.failed("Invalid parameters");
@@ -288,6 +330,8 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
     }
 
     @Override
+    @Transactional
+    @OperationLog(module = "SKU", operationType = "UPDATE", content = "Update SKU status", businessIdParam = "id")
     public CommonResult<String> updateStatus(Long id, Integer status) {
         if (id == null || (status != 0 && status != 1)) {
             return CommonResult.failed("Invalid parameters");
@@ -301,5 +345,23 @@ public class PmsProductSkuServiceImpl implements PmsProductSkuService {
         sku.setUpdateTime(LocalDateTime.now());
         pmsProductSkuRepository.save(sku);
         return CommonResult.success("Updated SKU status successfully");
+    }
+
+    @Override
+    public CommonResult<List<SysOperationLog>> getSkuLogs(Long skuId) {
+        if (skuId == null) {
+            return CommonResult.failed("Invalid SKU ID");
+        }
+        List<SysOperationLog> logs = sysOperationLogRepository.findByModuleAndBusinessId("SKU", skuId.toString());
+        return CommonResult.success(logs, "Fetched SKU logs successfully");
+    }
+
+    @Override
+    public CommonResult<List<PmsSkuPriceHistory>> getPriceHistory(Long skuId) {
+        if (skuId == null) {
+            return CommonResult.failed("Invalid SKU ID");
+        }
+        List<PmsSkuPriceHistory> history = pmsSkuPriceHistoryRepository.findBySkuId(skuId);
+        return CommonResult.success(history, "Fetched SKU price history successfully");
     }
 }

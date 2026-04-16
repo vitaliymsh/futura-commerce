@@ -36,4 +36,8 @@ public interface PmsProductSkuService {
     CommonResult<String> batchUpdateStatus(List<Long> ids, Integer status);
 
     CommonResult<String> updateStatus(Long id, Integer status);
+
+    CommonResult<List<SysOperationLog>> getSkuLogs(Long skuId);
+
+    CommonResult<List<PmsSkuPriceHistory>> getPriceHistory(Long skuId);
 }

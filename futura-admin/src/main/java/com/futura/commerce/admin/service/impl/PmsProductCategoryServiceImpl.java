@@ -52,6 +52,58 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
     }
 
     @Override
+    public CommonResult<String> addCategory(PmsProductCategory category) {
+        if (category == null) {
+            return CommonResult.failed("Category cannot be null");
+        }
+        pmsProductCategoryRepository.save(category);
+        return CommonResult.success("Category created successfully");
+    }
+
+    @Override
+    public CommonResult<String> updateCategory(Long id, PmsProductCategory category) {
+        if (id == null || category == null) {
+            return CommonResult.failed("Invalid parameters");
+        }
+        Optional<PmsProductCategory> existing = pmsProductCategoryRepository.findById(id);
+        if (existing.isEmpty()) {
+            return CommonResult.failed("Category not found");
+        }
+        category.setId(id);
+        pmsProductCategoryRepository.save(category);
+        return CommonResult.success("Category updated successfully");
+    }
+
+    @Override
+    public CommonResult<String> deleteCategory(Long id) {
+        if (id == null) {
+            return CommonResult.failed("Invalid category ID");
+        }
+        Optional<PmsProductCategory> categoryOpt = pmsProductCategoryRepository.findById(id);
+        if (categoryOpt.isEmpty()) {
+            return CommonResult.failed("Category not found");
+        }
+
+        PmsProductCategory category = categoryOpt.get();
+        if (category.getParentId() != null && category.getParentId() == 0) {
+            // Level 1 category: check for level 2 child categories
+            long count = pmsProductCategoryRepository.countByParentId(id);
+            if (count > 0) {
+                return CommonResult.failed("Cannot delete category with existing subcategories");
+            }
+        } else {
+            // Level 2 category: check for assigned products
+            long count = pmsProductRepository.countByCategoryId(id);
+            if (count > 0) {
+                return CommonResult.failed("Cannot delete category with associated products");
+            }
+        }
+
+        pmsProductCategoryRepository.deleteById(id);
+        return CommonResult.success("Category deleted successfully");
+    }
+
+    @Override
     public CommonResult<List<CategoryNode>> getCategoriesList() {
         // 1. fetch all category levels
         List<PmsProductCategory> categoryList = pmsProductCategoryRepository.findAll();

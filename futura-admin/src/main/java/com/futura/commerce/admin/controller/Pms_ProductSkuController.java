@@ -4,6 +4,8 @@ import com.futura.commerce.admin.dto.PmsSkuSearchDTO;
 import com.futura.commerce.admin.service.PmsProductSkuService;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProductSku;
+import com.futura.commerce.mbg.model.PmsSkuPriceHistory;
+import com.futura.commerce.mbg.model.SysOperationLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -120,5 +122,25 @@ public class Pms_ProductSkuController {
     @Operation(summary = "Update SKU status", description = "Toggle publish status for individual SKU")
     public CommonResult<String> updateStatus(@PathVariable Long id, @PathVariable Integer status) {
         return productSkuService.updateStatus(id, status);
+    }
+
+    /**
+     * Query SKU operation logs
+     */
+    @GetMapping("/logs")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','sku:view')")
+    @Operation(summary = "Query SKU operation logs", description = "Retrieve operation log history for a specific SKU")
+    public CommonResult<List<SysOperationLog>> getSkuLogs(@RequestParam Long skuId) {
+        return productSkuService.getSkuLogs(skuId);
+    }
+
+    /**
+     * Query SKU price change history
+     */
+    @GetMapping("/price-history")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','sku:view')")
+    @Operation(summary = "Query SKU price history", description = "Retrieve price history records for a specific SKU")
+    public CommonResult<List<PmsSkuPriceHistory>> getPriceHistory(@RequestParam Long skuId) {
+        return productSkuService.getPriceHistory(skuId);
     }
 }
