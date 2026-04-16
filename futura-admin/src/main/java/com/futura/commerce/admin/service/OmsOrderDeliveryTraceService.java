@@ -1,5 +1,6 @@
 package com.futura.commerce.admin.service;
 
+import com.futura.commerce.admin.vo.OmsDeliveryVO;
 import com.futura.commerce.mbg.model.OmsOrderDeliveryTrace;
 
 import java.util.List;
@@ -12,4 +13,6 @@ import java.util.List;
 public interface OmsOrderDeliveryTraceService {
 
     List<OmsOrderDeliveryTrace> getTracesByDeliveryId(Long deliveryId);
+
+    List<OmsDeliveryVO> getDeliveryList();
 }

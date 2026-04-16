@@ -1,6 +1,6 @@
 package com.futura.commerce.admin.service;
 
-import com.futura.commerce.admin.vo.OmsOrderAndDeliveryVO;
+import com.futura.commerce.admin.vo.OmsDeliveryVO;
 import com.futura.commerce.common.api.CommonResult;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public interface OmsOrderDeliveryService {
 
-    CommonResult<List<OmsOrderAndDeliveryVO>> selcetOrderAndDeliveryList();
+    CommonResult<List<OmsDeliveryVO>> selcetOrderAndDeliveryList();
 
     CommonResult<?> getLogisticsById(Long id);
 

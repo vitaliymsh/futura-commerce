@@ -1,21 +1,14 @@
 package com.futura.commerce.admin.service;
 
-import com.futura.commerce.mbg.model.OmsOrder;
-import java.util.List;
-import java.util.Optional;
+import com.futura.commerce.admin.vo.OmsOrderVO;
+import com.futura.commerce.common.api.CommonResult;
 
 /**
- * Service interface for managing OmsOrder
+ * Service interface for order operations
  *
  * @author Vitalii
  */
 public interface OmsOrderService {
 
-    List<OmsOrder> findAll();
-
-    Optional<OmsOrder> findById(Long id);
-
-    OmsOrder save(OmsOrder entity);
-
-    void deleteById(Long id);
+    CommonResult<OmsOrderVO> orderDetail(Long id);
 }

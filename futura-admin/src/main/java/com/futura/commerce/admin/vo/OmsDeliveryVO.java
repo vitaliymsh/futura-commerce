@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Merged order and delivery projection VO
+ * Order delivery presentation VO
  *
  * @author Vitalii
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OmsOrderAndDeliveryVO {
+public class OmsDeliveryVO {
     private Long orderId;
     private String orderNo;
     private String receiverName;
@@ -24,4 +24,6 @@ public class OmsOrderAndDeliveryVO {
     private LocalDateTime signTime;
     private LocalDateTime deliveryTime;
     private String deliveryUser;
+    private String deliveryCompany;
+    private String deliveryNo;
 }

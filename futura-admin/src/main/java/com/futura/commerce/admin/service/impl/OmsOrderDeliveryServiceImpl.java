@@ -2,7 +2,7 @@ package com.futura.commerce.admin.service.impl;
 
 import com.futura.commerce.admin.service.OmsOrderDeliveryService;
 import com.futura.commerce.admin.service.OmsOrderDeliveryTraceService;
-import com.futura.commerce.admin.vo.OmsOrderAndDeliveryVO;
+import com.futura.commerce.admin.vo.OmsDeliveryVO;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.OmsOrder;
 import com.futura.commerce.mbg.model.OmsOrderDelivery;
@@ -35,7 +35,7 @@ public class OmsOrderDeliveryServiceImpl implements OmsOrderDeliveryService {
     private OmsOrderDeliveryTraceService deliveryTraceService;
 
     @Override
-    public CommonResult<List<OmsOrderAndDeliveryVO>> selcetOrderAndDeliveryList() {
+    public CommonResult<List<OmsDeliveryVO>> selcetOrderAndDeliveryList() {
         List<OmsOrderDelivery> deliveries = orderDeliveryRepository.findAll();
         if (deliveries.isEmpty()) {
             return CommonResult.success(List.of(), "No order deliveries found");
@@ -45,9 +45,9 @@ public class OmsOrderDeliveryServiceImpl implements OmsOrderDeliveryService {
         Map<Long, OmsOrder> orderMap = orderRepository.findAllById(orderIds).stream()
                 .collect(Collectors.toMap(OmsOrder::getId, o -> o, (k1, k2) -> k1));
 
-        List<OmsOrderAndDeliveryVO> list = deliveries.stream().map(d -> {
+        List<OmsDeliveryVO> list = deliveries.stream().map(d -> {
             OmsOrder order = orderMap.get(d.getOrderId());
-            return new OmsOrderAndDeliveryVO(
+            return new OmsDeliveryVO(
                     d.getOrderId(),
                     d.getOrderNo(),
                     order != null ? order.getReceiverName() : null,
@@ -56,7 +56,9 @@ public class OmsOrderDeliveryServiceImpl implements OmsOrderDeliveryService {
                     d.getDeliveryStatus(),
                     d.getSignTime(),
                     d.getDeliveryTime(),
-                    d.getDeliveryUser()
+                    d.getDeliveryUser(),
+                    d.getDeliveryCompany(),
+                    d.getDeliveryNo()
             );
         }).collect(Collectors.toList());
 
@@ -108,9 +110,9 @@ public class OmsOrderDeliveryServiceImpl implements OmsOrderDeliveryService {
         Map<Long, OmsOrder> orderMap = orderRepository.findAllById(orderIds).stream()
                 .collect(Collectors.toMap(OmsOrder::getId, o -> o, (k1, k2) -> k1));
 
-        List<OmsOrderAndDeliveryVO> list = deliveries.stream().map(d -> {
+        List<OmsDeliveryVO> list = deliveries.stream().map(d -> {
             OmsOrder order = orderMap.get(d.getOrderId());
-            return new OmsOrderAndDeliveryVO(
+            return new OmsDeliveryVO(
                     d.getOrderId(),
                     d.getOrderNo(),
                     order != null ? order.getReceiverName() : null,
@@ -119,7 +121,9 @@ public class OmsOrderDeliveryServiceImpl implements OmsOrderDeliveryService {
                     d.getDeliveryStatus(),
                     d.getSignTime(),
                     d.getDeliveryTime(),
-                    d.getDeliveryUser()
+                    d.getDeliveryUser(),
+                    d.getDeliveryCompany(),
+                    d.getDeliveryNo()
             );
         }).collect(Collectors.toList());
 
