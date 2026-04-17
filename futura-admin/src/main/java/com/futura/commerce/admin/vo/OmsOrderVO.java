@@ -1,20 +1,35 @@
 package com.futura.commerce.admin.vo;
 
 import com.futura.commerce.mbg.model.OmsOrder;
-import com.futura.commerce.mbg.model.OmsOrderDelivery;
-import com.futura.commerce.mbg.model.OmsOrderItem;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Order detail presentation VO
+ * Order details presentation VO
  *
  * @author Vitalii
  */
 @Data
-public class OmsOrderVO {
-    private OmsOrder order;
-    private OmsOrderDelivery delivery;
-    private List<OmsOrderItem> orderItemList;
+@EqualsAndHashCode(callSuper = true)
+public class OmsOrderVO extends OmsOrder {
+    private String deliveryCompany;
+    private String orderNo;
+    private Integer deliveryStatus;
+    private LocalDateTime signTime;
+    private String deliveryNo;
+
+    private List<OrderItemVO> orderItemList;
+
+    @Data
+    public static class OrderItemVO {
+        private String productName;
+        private String pic;
+        private String spec;
+        private String productPrice;
+        private Integer productQuantity;
+        private String productPriceAmount;
+    }
 }

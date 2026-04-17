@@ -10,5 +10,5 @@ import com.futura.commerce.common.api.CommonResult;
  */
 public interface OmsOrderService {
 
-    CommonResult<OmsOrderVO> orderDetail(Long id);
+    CommonResult<OmsOrderVO> getOrderDetailById(Long id);
 }

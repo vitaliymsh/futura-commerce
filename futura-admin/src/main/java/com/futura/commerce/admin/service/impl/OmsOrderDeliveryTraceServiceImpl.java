@@ -1,7 +1,7 @@
 package com.futura.commerce.admin.service.impl;
 
 import com.futura.commerce.admin.service.OmsOrderDeliveryTraceService;
-import com.futura.commerce.admin.vo.OmsDeliveryVO;
+import com.futura.commerce.admin.vo.OmsDeliveryAndTraceVO;
 import com.futura.commerce.mbg.model.OmsOrder;
 import com.futura.commerce.mbg.model.OmsOrderDelivery;
 import com.futura.commerce.mbg.model.OmsOrderDeliveryTrace;
@@ -42,7 +42,7 @@ public class OmsOrderDeliveryTraceServiceImpl implements OmsOrderDeliveryTraceSe
     }
 
     @Override
-    public List<OmsDeliveryVO> getDeliveryList() {
+    public List<OmsDeliveryAndTraceVO> getDeliveryList() {
         List<OmsOrderDelivery> deliveries = orderDeliveryRepository.findAll();
         if (deliveries.isEmpty()) {
             return List.of();
@@ -54,7 +54,7 @@ public class OmsOrderDeliveryTraceServiceImpl implements OmsOrderDeliveryTraceSe
 
         return deliveries.stream().map(d -> {
             OmsOrder order = orderMap.get(d.getOrderId());
-            return new OmsDeliveryVO(
+            return new OmsDeliveryAndTraceVO(
                     d.getOrderId(),
                     d.getOrderNo(),
                     order != null ? order.getReceiverName() : null,
@@ -65,7 +65,9 @@ public class OmsOrderDeliveryTraceServiceImpl implements OmsOrderDeliveryTraceSe
                     d.getDeliveryTime(),
                     d.getDeliveryUser(),
                     d.getDeliveryCompany(),
-                    d.getDeliveryNo()
+                    d.getDeliveryNo(),
+                    null,
+                    d.getUpdateTime()
             );
         }).collect(Collectors.toList());
     }

@@ -31,6 +31,6 @@ public class OmsOrderController {
     @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','order:view')")
     @Operation(summary = "Get order details", description = "Retrieve complete order details including delivery and items")
     public CommonResult<OmsOrderVO> orderDetail(@PathVariable Long id) {
-        return omsOrderService.orderDetail(id);
+        return omsOrderService.getOrderDetailById(id);
     }
 }

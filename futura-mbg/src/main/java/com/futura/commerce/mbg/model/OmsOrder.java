@@ -28,5 +28,6 @@ public class OmsOrder implements Serializable {
     private String receiverName;
     private String receiverPhone;
     private String receiverAddress;
+    private String remark;
     private LocalDateTime createTime;
 }
