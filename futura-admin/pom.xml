@@ -24,6 +24,13 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- EasyExcel for Excel export and import -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
