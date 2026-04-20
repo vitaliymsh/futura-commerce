@@ -23,13 +23,14 @@ public class OmsOrderDelivery implements Serializable {
 
     private Long orderId;
     private String orderNo;
-    private String deliveryCompany;
+    private Integer deliveryCompanyId;
     private String deliveryUser;
     private String deliveryUserPhone;
     private String deliveryNo;
     private Integer deliveryStatus;
     private LocalDateTime deliveryTime;
     private LocalDateTime signTime;
+    private String operator;
     private String remark;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

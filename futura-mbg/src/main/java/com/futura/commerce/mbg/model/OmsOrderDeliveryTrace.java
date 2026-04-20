@@ -22,9 +22,11 @@ public class OmsOrderDeliveryTrace implements Serializable {
     private Long id;
 
     private Long deliveryId;
-    private String traceStatus;
-    private String traceLocation;
-    private String traceContent;
+    private Integer operatorId;
+    private Integer operationType;
     private LocalDateTime traceTime;
+    private Integer traceStatus;
+    private String traceAddress;
+    private Integer sort;
     private LocalDateTime createTime;
 }

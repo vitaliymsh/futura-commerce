@@ -21,13 +21,26 @@ public class OmsOrder implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String orderNo;
     private Long userId;
     private BigDecimal totalAmount;
+    private BigDecimal payAmount;
+    private BigDecimal freightAmount;
+    private Integer payType;
     private Integer status;
     private String receiverName;
     private String receiverPhone;
     private String receiverAddress;
+    private LocalDateTime payTime;
+    private LocalDateTime deliveryTime;
+    private LocalDateTime receiveTime;
+    private LocalDateTime finishTime;
+    private LocalDateTime cancelTime;
     private String remark;
     private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+
+    @Transient
+    private Integer deliveryStatus;
 }
