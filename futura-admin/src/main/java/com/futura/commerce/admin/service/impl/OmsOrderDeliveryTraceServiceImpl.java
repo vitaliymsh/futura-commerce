@@ -234,32 +234,6 @@ public class OmsOrderDeliveryTraceServiceImpl implements OmsOrderDeliveryTraceSe
         return sysTableColumnConfigService.updateColumnConfig(list, pageCode);
     }
 
-    @Override
-    public CommonResult<List<OmsOrderDeliveryTraceExcel>> exportExcel(OmsOrderDeliveryTraceSearchDTO dto) {
-        CommonResult<List<OmsDeliveryAndTraceVO>> searchResult = this.searchDto(dto);
-        List<OmsDeliveryAndTraceVO> records = searchResult.getData();
-        List<OmsOrderDeliveryTraceExcel> collect = records.stream().map(vo -> {
-            OmsOrderDeliveryTraceExcel excel = new OmsOrderDeliveryTraceExcel();
-            excel.setOrderNo(vo.getOrderNo());
-            excel.setDeliveryNo(vo.getDeliveryNo());
-            excel.setReceiverName(vo.getReceiverName());
-            excel.setReceiverPhone(vo.getReceiverPhone());
-            excel.setDeliveryCompany(vo.getDeliveryCompanyId());
-            excel.setTraceStatus(vo.getTraceStatus());
-            if (vo.getDeliveryTime() != null) {
-                excel.setDeliveryStartTime(vo.getDeliveryTime().toString());
-                excel.setDeliveryEndTime(vo.getDeliveryTime().toString());
-            }
-            if (vo.getTraceTime() != null) {
-                excel.setTraceStartTime(vo.getTraceTime().toString());
-                excel.setTraceEndTime(vo.getTraceTime().toString());
-            }
-            return excel;
-        }).collect(Collectors.toList());
-
-        return CommonResult.success(collect, "Export delivery traces successful");
-    }
-
     private List<OmsDeliveryAndTraceVO> convertToVOList(List<OmsOrderDelivery> deliveries) {
         if (deliveries.isEmpty()) {
             return List.of();

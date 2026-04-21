@@ -1,7 +1,9 @@
 package com.futura.commerce.admin.controller;
 
 import com.futura.commerce.admin.dto.DeliveryShipDTO;
+import com.futura.commerce.admin.dto.OmsOrderDeliveryCancelDTO;
 import com.futura.commerce.admin.dto.OmsOrderDeliverySearchDTO;
+import com.futura.commerce.admin.dto.UpdateTrackingNoDTO;
 import com.futura.commerce.admin.service.OmsOrderDeliveryService;
 import com.futura.commerce.admin.vo.OmsDeliveryAndTraceVO;
 import com.futura.commerce.common.api.CommonResult;
@@ -80,6 +82,26 @@ public class OmsOrderDeliveryController {
     @Operation(summary = "Ship order", description = "Dispatch order with shipping and carrier details")
     public CommonResult<DeliveryShipDTO> ship(@PathVariable(value = "id") Long orderId, @RequestBody DeliveryShipDTO dto) {
         return deliveryService.ship(orderId, dto);
+    }
+
+    /**
+     * Update tracking number
+     */
+    @PutMapping("/tracking/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','delivery:view')")
+    @Operation(summary = "Update tracking number", description = "Update tracking number for order delivery")
+    public CommonResult<?> updateTrackingNo(@PathVariable(value = "id") Long orderId, @RequestBody UpdateTrackingNoDTO dto) {
+        return deliveryService.updateTrackingNo(orderId, dto);
+    }
+
+    /**
+     * Cancel delivery shipment
+     */
+    @PostMapping("/cancel/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','delivery:view')")
+    @Operation(summary = "Cancel shipment", description = "Cancel pending shipment and soft-delete record")
+    public CommonResult<?> cancelDelivery(@PathVariable(value = "id") Long orderId, @RequestBody OmsOrderDeliveryCancelDTO dto) {
+        return deliveryService.cancelDelivery(orderId, dto);
     }
 
     /**

@@ -1,7 +1,9 @@
 package com.futura.commerce.admin.service;
 
 import com.futura.commerce.admin.dto.DeliveryShipDTO;
+import com.futura.commerce.admin.dto.OmsOrderDeliveryCancelDTO;
 import com.futura.commerce.admin.dto.OmsOrderDeliverySearchDTO;
+import com.futura.commerce.admin.dto.UpdateTrackingNoDTO;
 import com.futura.commerce.admin.vo.OmsDeliveryAndTraceVO;
 import com.futura.commerce.admin.vo.OmsDeliveryVO;
 import com.futura.commerce.common.api.CommonResult;
@@ -33,4 +35,8 @@ public interface OmsOrderDeliveryService {
     CommonResult<Map<String, Long>> selectStatus();
 
     CommonResult<DeliveryShipDTO> ship(Long orderId, DeliveryShipDTO dto);
+
+    CommonResult<?> updateTrackingNo(Long orderId, UpdateTrackingNoDTO dto);
+
+    CommonResult<?> cancelDelivery(Long orderId, OmsOrderDeliveryCancelDTO dto);
 }

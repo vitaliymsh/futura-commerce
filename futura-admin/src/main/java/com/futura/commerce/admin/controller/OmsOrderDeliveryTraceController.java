@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,13 +31,14 @@ public class OmsOrderDeliveryTraceController {
     private OmsOrderDeliveryTraceService omsOrderDeliveryTraceService;
 
     /**
-     * Get logistics delivery trace list
+     * Get logistics delivery trace list with pagination and column preferences
      */
-    @Operation(summary = "Get delivery trace list", description = "Retrieve list of all deliveries and tracking info")
+    @Operation(summary = "Get delivery trace list", description = "Retrieve paginated list of deliveries and column preferences")
     @GetMapping("/list")
-    public CommonResult<List<OmsDeliveryAndTraceVO>> list() {
-        List<OmsDeliveryAndTraceVO> list = omsOrderDeliveryTraceService.getDeliveryList();
-        return CommonResult.success(list, "Fetched delivery trace list successfully");
+    public CommonResult<Page<OmsDeliveryAndTraceVO>> list(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return omsOrderDeliveryTraceService.getDeliveryList(pageNum, pageSize);
     }
 
     /**
@@ -67,5 +69,15 @@ public class OmsOrderDeliveryTraceController {
     @Operation(summary = "Search logistics info", description = "Search logistics information by criteria")
     public CommonResult<List<OmsDeliveryAndTraceVO>> search(@RequestBody OmsOrderDeliveryTraceSearchDTO dto) {
         return omsOrderDeliveryTraceService.searchDto(dto);
+    }
+
+    /**
+     * Save table column display configuration
+     */
+    @PostMapping("/saveColumnConfig")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','delivery:view')")
+    @Operation(summary = "Save column configuration", description = "Save user personalized table column display and sort preferences")
+    public CommonResult<?> setDeliveryTraceColumn(@RequestBody List<Map<String, Object>> list) {
+        return omsOrderDeliveryTraceService.setDeliveryTraceColumn(list);
     }
 }

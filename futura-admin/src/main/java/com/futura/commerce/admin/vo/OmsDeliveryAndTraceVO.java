@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Order delivery and tracking details VO
@@ -32,4 +34,6 @@ public class OmsDeliveryAndTraceVO {
     private Integer traceStatus;
     private Integer sort;
     private LocalDateTime traceTime;
+    private Integer delFlag;
+    private List<Map<String, Object>> resultList;
 }

@@ -32,6 +32,8 @@ public class OmsOrderDelivery implements Serializable {
     private LocalDateTime signTime;
     private String operator;
     private String remark;
+    private Integer delFlag;
+    private Integer sort;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }
