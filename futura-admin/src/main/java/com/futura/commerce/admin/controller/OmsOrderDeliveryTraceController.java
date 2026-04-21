@@ -1,18 +1,25 @@
 package com.futura.commerce.admin.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.futura.commerce.admin.dto.OmsOrderDeliveryTraceSearchDTO;
 import com.futura.commerce.admin.dto.OmsOrderDeliveryUpdateDTO;
+import com.futura.commerce.admin.export.OmsOrderDeliveryTraceExcel;
 import com.futura.commerce.admin.service.OmsOrderDeliveryTraceService;
 import com.futura.commerce.admin.vo.OmsDeliveryAndTraceVO;
 import com.futura.commerce.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -79,5 +86,22 @@ public class OmsOrderDeliveryTraceController {
     @Operation(summary = "Save column configuration", description = "Save user personalized table column display and sort preferences")
     public CommonResult<?> setDeliveryTraceColumn(@RequestBody List<Map<String, Object>> list) {
         return omsOrderDeliveryTraceService.setDeliveryTraceColumn(list);
+    }
+
+    /**
+     * Export delivery trace records to Excel
+     */
+    @PostMapping("/export")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','delivery:view')")
+    @Operation(summary = "Export delivery trace records", description = "Export delivery trace information into Excel file")
+    public void exportExcel(@RequestBody OmsOrderDeliveryTraceSearchDTO dto, HttpServletResponse response) throws IOException {
+        CommonResult<List<OmsOrderDeliveryTraceExcel>> result = omsOrderDeliveryTraceService.exportExcel(dto);
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("delivery_trace_" + LocalDate.now(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), OmsOrderDeliveryTraceExcel.class)
+                .sheet("DeliveryTrace")
+                .doWrite(result.getData());
     }
 }

@@ -2,6 +2,7 @@ package com.futura.commerce.admin.service;
 
 import com.futura.commerce.admin.dto.OmsOrderDeliveryTraceSearchDTO;
 import com.futura.commerce.admin.dto.OmsOrderDeliveryUpdateDTO;
+import com.futura.commerce.admin.export.OmsOrderDeliveryTraceExcel;
 import com.futura.commerce.admin.vo.OmsDeliveryAndTraceVO;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.OmsOrderDeliveryTrace;
@@ -30,4 +31,6 @@ public interface OmsOrderDeliveryTraceService {
     CommonResult<List<OmsDeliveryAndTraceVO>> searchDto(OmsOrderDeliveryTraceSearchDTO dto);
 
     CommonResult<?> setDeliveryTraceColumn(List<Map<String, Object>> list);
+
+    CommonResult<List<OmsOrderDeliveryTraceExcel>> exportExcel(OmsOrderDeliveryTraceSearchDTO dto);
 }
