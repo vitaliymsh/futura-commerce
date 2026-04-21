@@ -1,39 +1,53 @@
 package com.futura.commerce.admin.controller;
 
+import com.futura.commerce.admin.dto.ActivitySearchDTO;
+import com.futura.commerce.admin.dto.SmsSeckillUpdateDTO;
 import com.futura.commerce.admin.service.SmsSeckillService;
-import com.futura.commerce.admin.vo.SmsFlashSaleVO;
 import com.futura.commerce.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
- * Flash sale marketing activity controller
+ * Controller for flash sale promotion management
  *
  * @author Vitalii
  */
-@Slf4j
 @RestController
-@RequestMapping("/activity")
+@RequestMapping("/skill")
 @Tag(name = "SkillController", description = "Flash sale activity management")
 public class SkillController {
 
     @Resource
     private SmsSeckillService smsSeckillService;
 
-    @RequestMapping("/list")
+    @PostMapping("/update/{id}")
+    @Operation(summary = "Edit flash sale activity", description = "Update flash sale activity and its basic information")
     @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','activity:view')")
-    @Operation(summary = "Flash sale activity list", description = "Paginated list of flash sale activity products")
-    public CommonResult<Page<SmsFlashSaleVO>> skillList(
-            @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false, defaultValue = "1") Integer type) {
-        return smsSeckillService.getSkillList(pageNum, pageSize, type);
+    public CommonResult<SmsSeckillUpdateDTO> skillEdit(@PathVariable Long id, @RequestBody SmsSeckillUpdateDTO smsSeckill) {
+        return smsSeckillService.skillEdit(id, smsSeckill);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Delete flash sale activity", description = "Delete a single flash sale activity")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','activity:view')")
+    public CommonResult<String> skillDelete(@PathVariable Long id) {
+        return smsSeckillService.skillDelete(id);
+    }
+
+    @DeleteMapping("/delete/batch")
+    @Operation(summary = "Batch delete flash sale activities", description = "Batch delete multiple flash sale activities")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','activity:view')")
+    public CommonResult<String> skillDeleteBatch(@RequestBody Long[] ids) {
+        return smsSeckillService.skillDeleteBatch(ids);
+    }
+
+    @PostMapping("/search")
+    @Operation(summary = "Search flash sale activities", description = "Search flash sale activities by filter parameters")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','activity:view')")
+    public CommonResult<ActivitySearchDTO> skillSearch(@RequestBody ActivitySearchDTO smsSeckill) {
+        return smsSeckillService.skillSearch(smsSeckill);
     }
 }

@@ -101,4 +101,166 @@ public class SmsSeckillServiceImpl implements SmsSeckillService {
 
         return CommonResult.success(new PageImpl<>(pageContent, pageable, total), "Fetched flash sale list successfully");
     }
+
+    @Override
+    public CommonResult<com.futura.commerce.admin.dto.SmsSeckillUpdateDTO> skillEdit(Long id, com.futura.commerce.admin.dto.SmsSeckillUpdateDTO dto) {
+        try {
+            if (dto == null) {
+                return CommonResult.failed("Request body is empty");
+            }
+            Long activityId = dto.getActivityId();
+            if (activityId != null) {
+                Optional<SmsActivity> actOpt = activityRepository.findById(activityId);
+                if (actOpt.isPresent()) {
+                    SmsActivity activity = actOpt.get();
+                    if (dto.getTitle() != null) {
+                        activity.setTitle(dto.getTitle());
+                    }
+                    if (dto.getStartTime() != null) {
+                        activity.setStartTime(dto.getStartTime());
+                    }
+                    if (dto.getEndTime() != null) {
+                        activity.setEndTime(dto.getEndTime());
+                    }
+                    if (dto.getDescription() != null) {
+                        activity.setDescription(dto.getDescription());
+                    }
+                    if (dto.getUserLevelLimit() != null && !dto.getUserLevelLimit().isEmpty()) {
+                        String[] levels = dto.getUserLevelLimit().split(",");
+                        activity.setUserLevelLimit(Integer.parseInt(levels[0].trim()));
+                    }
+                    if (dto.getOrderTypeLimit() != null && !dto.getOrderTypeLimit().isEmpty()) {
+                        String[] types = dto.getOrderTypeLimit().split(",");
+                        activity.setOrderTypeLimit(Integer.parseInt(types[0].trim()));
+                    }
+                    activityRepository.save(activity);
+                }
+            }
+
+            if (id != null) {
+                Optional<SmsSeckill> seckillOpt = seckillRepository.findById(id);
+                if (seckillOpt.isPresent()) {
+                    SmsSeckill seckill = seckillOpt.get();
+                    if (dto.getSkuId() != null) {
+                        seckill.setSkuId(dto.getSkuId());
+                    }
+                    if (dto.getSeckillPrice() != null) {
+                        seckill.setSeckillPrice(dto.getSeckillPrice());
+                    }
+                    if (dto.getStock() != null) {
+                        seckill.setStock(dto.getStock());
+                    }
+                    if (dto.getLimitQuantity() != null) {
+                        seckill.setLimitQuantity(dto.getLimitQuantity());
+                    }
+                    seckillRepository.save(seckill);
+                }
+            }
+
+            return CommonResult.success(dto, "Flash sale promotion updated successfully");
+        } catch (Exception e) {
+            log.error("Failed to edit flash sale", e);
+            return CommonResult.failed("Failed to edit flash sale: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult<String> skillDelete(Long id) {
+        try {
+            Optional<SmsSeckill> seckillOpt = seckillRepository.findById(id);
+            if (seckillOpt.isEmpty()) {
+                return CommonResult.failed("Flash sale does not exist");
+            }
+            SmsSeckill seckill = seckillOpt.get();
+            seckillRepository.deleteById(id);
+            if (seckill.getActivityId() != null) {
+                activityRepository.deleteById(seckill.getActivityId());
+            }
+            return CommonResult.success(null, "Deleted successfully");
+        } catch (Exception e) {
+            log.error("Failed to delete flash sale", e);
+            return CommonResult.failed("Failed to delete flash sale: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult<String> skillDeleteBatch(Long[] ids) {
+        try {
+            if (ids == null || ids.length == 0) {
+                return CommonResult.failed("No IDs specified for deletion");
+            }
+            List<Long> idList = Arrays.asList(ids);
+            List<SmsSeckill> seckills = seckillRepository.findAllById(idList);
+            List<Long> activityIds = seckills.stream()
+                    .map(SmsSeckill::getActivityId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            seckillRepository.deleteAllById(idList);
+            if (!activityIds.isEmpty()) {
+                activityRepository.deleteAllById(activityIds);
+            }
+            return CommonResult.success(null, "Batch deleted successfully");
+        } catch (Exception e) {
+            log.error("Failed to batch delete flash sales", e);
+            return CommonResult.failed("Batch deletion failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public CommonResult<com.futura.commerce.admin.dto.ActivitySearchDTO> skillSearch(com.futura.commerce.admin.dto.ActivitySearchDTO searchDTO) {
+        try {
+            CommonResult<Page<SmsFlashSaleVO>> resultVO = getSkillList(1, 1000, 1);
+            List<SmsFlashSaleVO> list = (resultVO.getData() != null) ? resultVO.getData().getContent() : List.of();
+
+            List<SmsFlashSaleVO> filteredList = list.stream()
+                    .filter(item -> {
+                        if (searchDTO.getActivityName() != null && !searchDTO.getActivityName().isEmpty()) {
+                            if (item.getActivityName() == null || !item.getActivityName().contains(searchDTO.getActivityName())) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getId() != null) {
+                            if (!searchDTO.getId().equals(item.getId())) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getStartTime() != null) {
+                            if (item.getStartTime() == null || item.getStartTime().isBefore(searchDTO.getStartTime())) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getEndTime() != null) {
+                            if (item.getEndTime() == null || item.getEndTime().isAfter(searchDTO.getEndTime())) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getProductName() != null && !searchDTO.getProductName().isEmpty()) {
+                            if (item.getProductName() == null || !item.getProductName().contains(searchDTO.getProductName())) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getSeckillPrice() != null) {
+                            if (item.getSeckillPrice() == null || item.getSeckillPrice().compareTo(searchDTO.getSeckillPrice()) < 0) {
+                                return false;
+                            }
+                        }
+                        if (searchDTO.getStockStatus() != null) {
+                            if (!searchDTO.getStockStatus().equals(item.getStockStatus())) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.toList());
+
+            com.futura.commerce.admin.dto.ActivitySearchDTO result = new com.futura.commerce.admin.dto.ActivitySearchDTO();
+            result.setId(filteredList.isEmpty() ? null : filteredList.get(0).getId());
+
+            return CommonResult.success(result, "Search completed successfully");
+        } catch (Exception e) {
+            log.error("Failed to search flash sales", e);
+            return CommonResult.failed("Search failed: " + e.getMessage());
+        }
+    }
 }

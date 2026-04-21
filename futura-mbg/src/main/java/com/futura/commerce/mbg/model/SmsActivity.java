@@ -60,4 +60,19 @@ public class SmsActivity implements Serializable {
      * Deletion flag: 0-not deleted, 1-deleted
      */
     private Integer isDeleted;
+
+    /**
+     * 3-offline 4-online
+     */
+    private String smsStatus;
+
+    /**
+     * User level limit: 0-regular, 1-VIP, 2-SVIP
+     */
+    private Integer userLevelLimit;
+
+    /**
+     * Order type limit: 0-regular, 1-presale, 2-group buy
+     */
+    private Integer orderTypeLimit;
 }
