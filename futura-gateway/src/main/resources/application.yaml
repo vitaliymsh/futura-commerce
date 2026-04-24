@@ -1,3 +1,60 @@
+server:
+  port: 8081
 spring:
   application:
     name: futura-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - AddResponseHeader=Cache-Control, no-cache, no-store, must-revalidate
+        - AddResponseHeader=Pragma, no-cache
+        - AddResponseHeader=Expires, 0
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns:
+              - "http://localhost:5173"
+              - "http://localhost:8081"
+              - "http://127.0.0.1:5173"
+              - "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - PATCH
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+      routes:
+        - id: futura-admin
+          uri: http://localhost:8086
+          predicates:
+            - Path=/admin/**
+          filters:
+            - StripPrefix=1
+        - id: futura-user
+          uri: http://localhost:8084
+          predicates:
+            - Path=/user/**
+        - id: futura-product
+          uri: http://localhost:8082
+          predicates:
+            - Path=/product/**, /Pms_promotion/**, /goods/**, /Sku/**, /goodList/**, /goodsPagination/**, /search/**, /selectSku/**
+        - id: futura-order
+          uri: http://localhost:8083
+          predicates:
+            - Path=/order/**, /delivery/**, /deliveryTrace/**, /after/**, /review/**
+        - id: futura-seckill
+          uri: http://localhost:8085
+          predicates:
+            - Path=/seckill/**, /activity/**, /skill/**
+        - id: futura-ai
+          uri: http://localhost:8087
+          predicates:
+            - Path=/ai/**
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
