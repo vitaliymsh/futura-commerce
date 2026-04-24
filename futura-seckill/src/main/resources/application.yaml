@@ -1,0 +1,19 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: futura-seckill
+  datasource:
+    url: jdbc:mysql://localhost:3307/mall?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=utf8
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+jwt:
+  secret: futura-seckill-internal-service-secret-key-2026
+  expiration: 86400000
+  tokenHeader: Authorization

@@ -58,6 +58,13 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+        <!-- Feign client interfaces -->
+        <dependency>
+            <groupId>com.futura.commerce</groupId>
+            <artifactId>futura-feign</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -102,7 +109,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

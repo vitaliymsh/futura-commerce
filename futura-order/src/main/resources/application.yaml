@@ -1,0 +1,15 @@
+server:
+  port: 8202
+spring:
+  application:
+    name: futura-order
+  datasource:
+    url: jdbc:mysql://localhost:3307/mall?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=utf8
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+jwt:
+  secret: futura-order-internal-service-secret-key-2026
+  expiration: 86400000
+  tokenHeader: Authorization
