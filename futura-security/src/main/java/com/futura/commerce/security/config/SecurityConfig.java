@@ -56,6 +56,13 @@ public class SecurityConfig {
                         .requestMatchers("/pic/**").permitAll()
                         // allow swagger api documentation and webjars
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**").permitAll()
+                        // allow internal microservice endpoints
+                        .requestMatchers("/Pms_promotion/**", "/Oms_order/**", "/Oms_delivery/**", "/Oms_deliveryTrace/**", "/Oms_item/**",
+                                "/Sms_seckill/**", "/Sms_skill/**", "/Sms_activity/**",
+                                "/goodList", "/goodsPagination", "/search", "/selectSku",
+                                "/goods/categories/**", "/goods/**", "/Sku/**", "/dashboard/**",
+                                "/order/**", "/delivery/**", "/deliveryTrace/**", "/item/**",
+                                "/promotion/**", "/skill/**", "/activity/**").permitAll()
                         // all other endpoints require authentication
                         .anyRequest().authenticated())
                 // 4. register jwt filter
