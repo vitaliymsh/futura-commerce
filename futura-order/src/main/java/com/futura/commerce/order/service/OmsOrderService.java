@@ -28,4 +28,6 @@ public interface OmsOrderService {
     CommonResult<List<OmsOrderListVO>> excelImport(List<OmsOrderImportExcel> list);
 
     CommonResult<List<OmsOrderListVO>> getOrderByIds(List<Long> ids);
+
+    CommonResult<com.futura.commerce.order.dto.PayDTO> orderPay(com.futura.commerce.order.dto.PayDTO payDTO);
 }
