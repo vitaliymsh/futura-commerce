@@ -1,23 +1,19 @@
+server:
+  port: 8207
 spring:
   application:
     name: futura-search
   datasource:
     url: jdbc:mysql://localhost:3307/mall?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: 123456
+    password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
-  elasticsearch:
-    uris: http://192.168.1.117:9200
-    connection-timeout: 30s
-    socket-timeout: 30s
-  data:
-    elasticsearch:
-      auto-create-index: false
-      repositories:
-        enabled: true
+
+elasticsearch:
+  host: 127.0.0.1
+  port: 9200
 
 logging:
   level:
-    org.springframework.data.elasticsearch: DEBUG
+    com.futura.commerce: DEBUG
     co.elastic.clients: DEBUG
-    org.elasticsearch.client: DEBUG

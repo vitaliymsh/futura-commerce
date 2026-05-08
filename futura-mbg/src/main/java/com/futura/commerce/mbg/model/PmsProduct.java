@@ -31,5 +31,7 @@ public class PmsProduct implements Serializable {
     private Integer promoteWeight;
     private Integer isPromotion;
     private String description;
+    @Transient
+    private String categoryName;
     private LocalDateTime createTime;
 }
