@@ -43,4 +43,6 @@ public interface PmsProductService {
     CommonResult<String> updateStatus(Long id, Integer status);
 
     CommonResult<String> updateProduct(Long id, PmsPromotionSearchDTO promotion);
+
+    CommonResult<com.futura.commerce.product.dto.ProductDetailDTO> detail(Long productId);
 }

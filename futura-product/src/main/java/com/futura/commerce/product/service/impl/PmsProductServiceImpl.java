@@ -3,9 +3,16 @@ package com.futura.commerce.product.service.impl;
 import com.futura.commerce.product.dto.IsPromotionDTO;
 import com.futura.commerce.product.dto.PmsPromotionSearchDTO;
 import com.futura.commerce.product.dto.PmsPromotionVO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.futura.commerce.mbg.model.PmsProductFeature;
+import com.futura.commerce.mbg.model.ProductParams;
+import com.futura.commerce.product.dto.ProductDetailDTO;
 import com.futura.commerce.product.service.CommonImageService;
 import com.futura.commerce.product.service.PmsProductCategoryService;
+import com.futura.commerce.product.service.PmsProductFeatureService;
 import com.futura.commerce.product.service.PmsProductService;
+import com.futura.commerce.product.service.ProductParamsService;
 import com.futura.commerce.common.baseCommon.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductCategory;
@@ -19,6 +26,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +55,20 @@ public class PmsProductServiceImpl implements PmsProductService {
 
     @Resource
     private CommonImageService commonImageService;
+
+    @Resource
+    private PmsProductFeatureService pmsProductFeatureService;
+
+    @Resource
+    private ProductParamsService productParamsService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private ObjectMapper objectMapper;
+
+    private static final String USER_DETAIL_KEY = "product:detail:";
 
     @Override
     public List<PmsProduct> findAll() {
@@ -246,5 +269,58 @@ public class PmsProductServiceImpl implements PmsProductService {
 
         pmsProductRepository.save(product);
         return CommonResult.success("Product updated successfully");
+    }
+
+    @Override
+    public CommonResult<ProductDetailDTO> detail(Long productId) {
+        if (productId == null) {
+            return CommonResult.failed("Invalid product ID");
+        }
+
+        String cacheKey = USER_DETAIL_KEY + productId;
+        try {
+            String cached = stringRedisTemplate.opsForValue().get(cacheKey);
+            if (cached != null) {
+                if (cached.trim().isEmpty()) {
+                    return CommonResult.failed("Product does not exist");
+                }
+                log.info("Cache hit for product detail: {}", productId);
+                ProductDetailDTO cachedDto = objectMapper.readValue(cached, ProductDetailDTO.class);
+                return CommonResult.success(cachedDto, "Product detail retrieved successfully");
+            }
+        } catch (Exception e) {
+            log.warn("Failed to retrieve product detail from cache: {}", e.getMessage());
+        }
+
+        // Prevent cache penetration
+        Optional<PmsProduct> productOpt = pmsProductRepository.findById(productId);
+        if (productOpt.isEmpty()) {
+            try {
+                stringRedisTemplate.opsForValue().set(cacheKey, " ", 1, TimeUnit.MINUTES);
+            } catch (Exception e) {
+                log.warn("Failed to write empty product to cache: {}", e.getMessage());
+            }
+            return CommonResult.failed("Product does not exist");
+        }
+
+        List<PmsProductFeature> featureList = pmsProductFeatureService.findByProductId(productId);
+        List<ProductParams> paramsList = productParamsService.findByProductsId(productId);
+
+        if (featureList == null) featureList = new ArrayList<>();
+        if (paramsList == null) paramsList = new ArrayList<>();
+
+        ProductDetailDTO detailDTO = new ProductDetailDTO();
+        detailDTO.setParamsList(paramsList);
+        detailDTO.setFeatureList(featureList);
+
+        try {
+            String json = objectMapper.writeValueAsString(detailDTO);
+            stringRedisTemplate.opsForValue().set(cacheKey, json, 1, TimeUnit.HOURS);
+        } catch (Exception e) {
+            log.warn("Failed to write product detail to cache: {}", e.getMessage());
+        }
+
+        log.info("Cache miss for product detail: {}", productId);
+        return CommonResult.success(detailDTO, "Product detail retrieved successfully");
     }
 }

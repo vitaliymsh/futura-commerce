@@ -16,6 +16,9 @@ import java.util.Map;
 @FeignClient(name = "futura-product", contextId = "productClient")
 public interface ProductFeignClient {
 
+    @GetMapping("/user/product/detail")
+    CommonResult<?> detail(@RequestParam("id") Long productId);
+
     @GetMapping("/Pms_promotion/goodList")
     CommonResult<?> goodsList();
 
