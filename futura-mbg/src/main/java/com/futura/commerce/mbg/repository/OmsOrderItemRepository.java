@@ -16,4 +16,6 @@ import java.util.List;
 public interface OmsOrderItemRepository extends JpaRepository<OmsOrderItem, Long>, JpaSpecificationExecutor<OmsOrderItem> {
 
     List<OmsOrderItem> findByOrderId(Long orderId);
+
+    List<OmsOrderItem> findByOrderSn(String orderSn);
 }

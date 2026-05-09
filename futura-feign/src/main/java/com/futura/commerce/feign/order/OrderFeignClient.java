@@ -1,6 +1,7 @@
 package com.futura.commerce.feign.order;
 
 import com.futura.commerce.common.api.CommonResult;
+import com.futura.commerce.common.dto.AiOrderProductDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,9 @@ import java.util.Map;
  */
 @FeignClient(name = "futura-order", contextId = "orderClient")
 public interface OrderFeignClient {
+
+    @GetMapping("/item/getByOrderNo")
+    AiOrderProductDto getByOrderNo(@RequestParam("orderNo") String orderNo);
 
     @GetMapping("/order/detail/{id}")
     CommonResult<?> orderDetail(@PathVariable Long id);
