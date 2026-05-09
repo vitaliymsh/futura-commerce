@@ -1,0 +1,25 @@
+# Futura Commerce Platform Knowledge Base & Operating Rules
+
+## 1. Order & Fulfillment Policies
+- Order Processing: Orders placed before 16:00 UTC are processed and dispatched on the same business day.
+- Delivery Windows: Standard shipping takes 2-4 business days. Express shipping delivers within 24-48 hours.
+- Tracking & Carriers: Real-time logistics tracking updates are published upon carrier manifest handoff (DHL, FedEx, UPS).
+
+## 2. Returns, Refunds & Dispute Arbitration
+- 30-Day Return Guarantee: Unopened and undamaged products can be returned within 30 days of confirmed delivery.
+- Return Workflow:
+  1. Customer files return request under Orders dashboard.
+  2. Operator reviews ticket within 24 hours under After-Sales queue.
+  3. Pre-paid shipping label is dispatched automatically upon approval.
+  4. Refund is credited to original payment method within 3-5 business days upon warehouse receipt.
+- Damaged / Defective Goods: Immediate replacement or instant full refund provided upon photo verification.
+
+## 3. Product Catalog & Inventory Governance
+- SKU Stock Thresholds: Low-stock warning is triggered when SKU available quantity falls below 10 units.
+- Price Integrity: Promotional discounts (Coupons, Seckill flash sales, Full reductions) cannot exceed 70% of base MSRP.
+- Category Taxonomy: Level 1 (Macro department), Level 2 (Product family), Level 3 (Specific subcategory).
+
+## 4. Payment & Billing Rules
+- Supported Gateways: Credit/Debit card, Apple Pay, Google Pay, SEPA / Wire transfer.
+- Invoicing: Automated VAT/GST invoice generation is triggered upon order completion and available for download.
+- Anti-Fraud Shield: Orders exceeding $5,000 or with mismatched billing/shipping addresses trigger secondary verification.
