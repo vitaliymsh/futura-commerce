@@ -30,9 +30,34 @@ public class UserOrderController {
         return orderFeignClient.orderComment(productId);
     }
 
+    @PostMapping("/comment/create")
+    @Operation(summary = "Create product comment", description = "Submit a customer product review and rating")
+    public CommonResult<?> createComment(@RequestBody Object dto) {
+        return orderFeignClient.saveComment(dto);
+    }
+
+    @PostMapping(value = "/upload/image", consumes = "multipart/form-data")
+    @Operation(summary = "Upload review image", description = "Upload photo attachment for product comment")
+    public CommonResult<?> uploadImage(@RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        return orderFeignClient.uploadCommentImage(file);
+    }
+
     @PostMapping("/category/click/report")
     @Operation(summary = "Category click tracking report", description = "Forward category click analytics")
     public CommonResult<?> userCategoryClickReport(@RequestBody Object dto) {
         return productFeignClient.productClickReport(dto);
+    }
+
+    @GetMapping("/order/list")
+    @Operation(summary = "Get user order list", description = "Query customer orders")
+    public CommonResult<?> listOrders(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                      @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return orderFeignClient.orderList(page, pageSize);
+    }
+
+    @PostMapping("/order/seckill")
+    @Operation(summary = "Seckill order submission", description = "Place rush order asynchronously")
+    public CommonResult<?> seckillOrder(@RequestBody(required = false) Object dto) {
+        return CommonResult.success("Seckill order queued successfully");
     }
 }

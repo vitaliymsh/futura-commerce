@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author Vitalii
  */
-@FeignClient(name = "futura-order", contextId = "orderClient")
+@FeignClient(name = "futura-order", url = "${futura.order.url:http://localhost:8083}", contextId = "orderClient")
 public interface OrderFeignClient {
 
     @GetMapping("/item/getByOrderNo")
@@ -22,6 +22,12 @@ public interface OrderFeignClient {
 
     @GetMapping("/user/comment/{productId}")
     CommonResult<?> orderComment(@PathVariable("productId") Long productId);
+
+    @PostMapping("/user/comment/create")
+    CommonResult<?> saveComment(@RequestBody Object orderCommentDTO);
+
+    @PostMapping(value = "/user/upload/image", consumes = "multipart/form-data")
+    CommonResult<String> uploadCommentImage(@RequestPart("file") MultipartFile file);
 
     @GetMapping("/review/list")
     CommonResult<?> reviewList(@RequestParam("page") Integer page,

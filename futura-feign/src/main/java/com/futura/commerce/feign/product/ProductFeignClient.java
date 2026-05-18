@@ -19,6 +19,9 @@ public interface ProductFeignClient {
     @GetMapping("/user/product/detail")
     CommonResult<?> detail(@RequestParam("id") Long productId);
 
+    @GetMapping("/user/cart/list")
+    CommonResult<?> cartList();
+
     @GetMapping("/user/product/recommend")
     CommonResult<?> productRecommend(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
                                      @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize);

@@ -28,9 +28,24 @@ public class UserCommentController {
     @Resource
     private OmsOrderCommentService omsOrderCommentService;
 
+    @Resource
+    private com.futura.commerce.order.service.CommonImageService commonImageService;
+
     @GetMapping("/comment/{productId}")
     @Operation(summary = "Get product comments", description = "Retrieve list of customer reviews for a given product")
     public CommonResult<List<OrderCommentDTO>> orderComment(@PathVariable Long productId) {
         return omsOrderCommentService.orderComment(productId);
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/comment/create")
+    @Operation(summary = "Create product comment", description = "Submit a customer product review and rating")
+    public CommonResult<OrderCommentDTO> saveComment(@org.springframework.web.bind.annotation.RequestBody OrderCommentDTO orderCommentDTO) {
+        return omsOrderCommentService.saveComment(orderCommentDTO);
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping(value = "/upload/image", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload review image", description = "Upload photo attachment for product comment")
+    public CommonResult<String> uploadImage(@org.springframework.web.bind.annotation.RequestPart("file") org.springframework.web.multipart.MultipartFile file) {
+        return commonImageService.upload(file);
     }
 }

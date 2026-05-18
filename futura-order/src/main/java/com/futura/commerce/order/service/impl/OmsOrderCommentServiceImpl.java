@@ -121,4 +121,56 @@ public class OmsOrderCommentServiceImpl implements OmsOrderCommentService {
         Page<AdminCommentDTO> resultPage = new PageImpl<>(dtoList, pageRequest, commentPage.getTotalElements());
         return com.futura.commerce.common.api.CommonResult.success(resultPage, "Review list retrieved successfully");
     }
+
+    @Override
+    public com.futura.commerce.common.api.CommonResult<com.futura.commerce.order.dto.OrderCommentDTO> saveComment(com.futura.commerce.order.dto.OrderCommentDTO orderCommentDTO) {
+        OmsOrderComment comment = new OmsOrderComment();
+        comment.setOrderId(orderCommentDTO.getOrderId());
+        comment.setOrderItemId(orderCommentDTO.getOrderItemId());
+        comment.setUserId(orderCommentDTO.getUserId());
+        comment.setProductId(orderCommentDTO.getProductId());
+        comment.setSkuId(orderCommentDTO.getSkuId());
+        comment.setScore(orderCommentDTO.getScore());
+        comment.setLogisticsScore(orderCommentDTO.getLogisticsScore());
+        comment.setServiceScore(orderCommentDTO.getServiceScore());
+        comment.setCommentContent(orderCommentDTO.getCommentContent());
+        comment.setIsNow(orderCommentDTO.getIsNow());
+        comment.setType(orderCommentDTO.getType() != null ? orderCommentDTO.getType() : 1);
+
+        Date now = new Date();
+        comment.setCommentTime(now);
+        comment.setCreateTime(now);
+
+        OmsOrderComment saved = commentRepository.save(comment);
+
+        List<Long> tagIds = orderCommentDTO.getTagIds();
+        if (tagIds != null && !tagIds.isEmpty()) {
+            List<CommentTagRelation> relations = tagIds.stream().map(tagId -> {
+                CommentTagRelation relation = new CommentTagRelation();
+                relation.setCommentId(saved.getId());
+                relation.setTagId(tagId);
+                return relation;
+            }).toList();
+            commentTagRelationRepository.saveAll(relations);
+        }
+
+        String commentImage = orderCommentDTO.getCommentImage();
+        if (commentImage != null && !commentImage.isBlank()) {
+            String[] imageUrls = commentImage.split(",");
+            List<ProductCommentImage> images = new ArrayList<>();
+            for (int i = 0; i < imageUrls.length; i++) {
+                ProductCommentImage image = new ProductCommentImage();
+                image.setCommentId(saved.getId());
+                image.setImgUrl(imageUrls[i].trim());
+                image.setSort(i);
+                image.setCreateTime(now);
+                images.add(image);
+            }
+            productCommentImageRepository.saveAll(images);
+        }
+
+        orderCommentDTO.setId(saved.getId());
+        return com.futura.commerce.common.api.CommonResult.success(orderCommentDTO, "Review submitted successfully");
+    }
 }
+
