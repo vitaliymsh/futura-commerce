@@ -1,7 +1,7 @@
 package com.futura.commerce.security.component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

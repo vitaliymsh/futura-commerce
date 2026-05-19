@@ -11,6 +11,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,8 +39,8 @@ public class OmsOrderItemServiceImpl implements OmsOrderItemService {
             }
 
             Map<Long, List<OmsOrderItem>> productGroupMap = orderItems.stream()
-                    .filter(item -> item.getSkuId() != null)
-                    .collect(Collectors.groupingBy(OmsOrderItem::getSkuId));
+                    .filter(item -> item.getProductSkuId() != null)
+                    .collect(Collectors.groupingBy(OmsOrderItem::getProductSkuId));
 
             List<OmsOrderItemVO> resultList = new ArrayList<>();
             String[] categories = {"Food & Beverage", "Apparel & Shoes", "Consumer Electronics", "Home Living", "Beauty & Care"};
@@ -54,7 +55,7 @@ public class OmsOrderItemServiceImpl implements OmsOrderItemService {
                 vo.setProductName(firstItem.getProductName());
                 vo.setPic(firstItem.getProductPic());
                 vo.setPrice(firstItem.getProductPrice());
-                vo.setCreateTime(firstItem.getCreateTime());
+                vo.setCreateTime(LocalDateTime.now());
 
                 Set<Long> orderIds = items.stream().map(OmsOrderItem::getOrderId).filter(Objects::nonNull).collect(Collectors.toSet());
                 int buyCounts = Math.max(1, orderIds.size());

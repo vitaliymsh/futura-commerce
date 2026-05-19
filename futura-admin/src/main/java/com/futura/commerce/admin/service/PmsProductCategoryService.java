@@ -1,7 +1,7 @@
 package com.futura.commerce.admin.service;
 
 import com.futura.commerce.admin.dto.CategoryNode;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProductCategory;
 
 import java.util.List;

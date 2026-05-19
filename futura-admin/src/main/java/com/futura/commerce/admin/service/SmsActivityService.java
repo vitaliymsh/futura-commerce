@@ -1,5 +1,6 @@
 package com.futura.commerce.admin.service;
 
+import com.futura.commerce.admin.dto.ActivitySearchDTO;
 import com.futura.commerce.admin.vo.ActivityListVO;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.SmsActivity;

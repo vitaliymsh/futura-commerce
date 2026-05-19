@@ -5,7 +5,7 @@ import com.futura.commerce.product.dto.CategoryNode;
 import com.futura.commerce.product.dto.ClickDTO;
 import com.futura.commerce.product.service.PmsProductCategoryService;
 import com.futura.commerce.product.service.PmsProductService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductCategory;
 import com.futura.commerce.mbg.repository.PmsProductCategoryRepository;
@@ -27,6 +27,9 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
 
     @Resource
     private PmsProductCategoryRepository pmsProductCategoryRepository;
+
+    @Resource
+    private com.futura.commerce.mbg.repository.PmsProductRepository pmsProductRepository;
 
     @Resource
     private PmsProductService productService;

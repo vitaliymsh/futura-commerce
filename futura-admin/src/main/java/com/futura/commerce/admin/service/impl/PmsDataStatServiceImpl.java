@@ -1,7 +1,7 @@
 package com.futura.commerce.admin.service.impl;
 
 import com.futura.commerce.admin.service.PmsDataStatService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsDataStat;
 import com.futura.commerce.mbg.repository.PmsDataStatRepository;
 import jakarta.annotation.Resource;

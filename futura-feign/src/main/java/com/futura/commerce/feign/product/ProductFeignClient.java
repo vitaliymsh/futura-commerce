@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author Vitalii
  */
-@FeignClient(name = "futura-product", contextId = "productClient")
+@FeignClient(name = "futura-product", url = "${futura.product.url:http://localhost:8082}", contextId = "productClient")
 public interface ProductFeignClient {
 
     @GetMapping("/user/product/detail")
@@ -99,4 +99,10 @@ public interface ProductFeignClient {
 
     @PostMapping("/Sku/del")
     CommonResult<String> delSku(@RequestBody Map<String, List<Long>> ids);
+
+    @GetMapping("/Sku/logs")
+    CommonResult<List<com.futura.commerce.mbg.model.SysOperationLog>> getSkuLogs(@RequestParam("skuId") Long skuId);
+
+    @GetMapping("/Sku/price-history")
+    CommonResult<List<com.futura.commerce.mbg.model.PmsSkuPriceHistory>> getPriceHistory(@RequestParam("skuId") Long skuId);
 }

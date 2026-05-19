@@ -25,7 +25,6 @@ public class MyCouponServiceImpl implements MyCouponService {
     private MyCouponRepository myCouponRepository;
 
     @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
-    @Override(rollbackFor = Exception.class)
     @Override
     public CommonResult<Object> receiveCoupon(Long userId, Integer type, Long couponId) {
         if (userId == null || couponId == null) {

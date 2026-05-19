@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,7 +138,7 @@ public class OmsOrderCommentServiceImpl implements OmsOrderCommentService {
         comment.setIsNow(orderCommentDTO.getIsNow());
         comment.setType(orderCommentDTO.getType() != null ? orderCommentDTO.getType() : 1);
 
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         comment.setCommentTime(now);
         comment.setCreateTime(now);
 

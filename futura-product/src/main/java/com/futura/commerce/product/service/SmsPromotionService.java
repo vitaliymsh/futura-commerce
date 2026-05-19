@@ -2,7 +2,7 @@ package com.futura.commerce.product.service;
 
 import com.futura.commerce.product.dto.GoodsQuotaRequestVO;
 import com.futura.commerce.product.dto.SmsPromotionProductVO;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.SmsPromotion;
 
 import java.util.List;

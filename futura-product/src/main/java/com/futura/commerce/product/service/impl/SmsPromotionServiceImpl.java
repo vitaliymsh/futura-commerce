@@ -5,8 +5,8 @@ import com.futura.commerce.product.dto.GoodsQuotaRequestVO;
 import com.futura.commerce.product.dto.SmsPromotionProductVO;
 import com.futura.commerce.product.service.PmsProductService;
 import com.futura.commerce.product.service.SmsPromotionService;
-import com.futura.commerce.product.service.UmsAdminService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.mbg.repository.UmsAdminRepository;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.SmsPromotion;
 import com.futura.commerce.mbg.model.SmsPromotionQuotaLog;
@@ -46,7 +46,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
     private PmsProductService pmsProductService;
 
     @Resource
-    private UmsAdminService umsAdminService;
+    private UmsAdminRepository umsAdminRepository;
 
     @Resource
     private SmsPromotionQuotaLogRepository smsPromotionQuotaLogRepository;
@@ -144,7 +144,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
             return CommonResult.unauthorized("Authentication required");
         }
 
-        Optional<UmsAdmin> adminOpt = umsAdminService.findById(adminId);
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
         if (adminOpt.isEmpty()) {
             return CommonResult.failed("Admin user not found");
         }
@@ -188,9 +188,9 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
 
             if (existPromotionOpt.isPresent()) {
                 SmsPromotion existPromotion = existPromotionOpt.get();
-                int currentQuota = existPromotion.getQuota() != null ? existPromotion.getQuota() : 0;
+                long currentQuota = existPromotion.getQuota() != null ? existPromotion.getQuota() : 0L;
                 int currentDays = existPromotion.getDays() != null ? existPromotion.getDays() : 0;
-                existPromotion.setQuota(Math.toIntExact(quota) + currentQuota);
+                existPromotion.setQuota((quota != null ? quota : 0L) + currentQuota);
                 existPromotion.setDays(Math.toIntExact(validDays) + currentDays);
                 existPromotion.setEndTime(endTime);
                 existPromotion.setPayTime(now);
@@ -203,7 +203,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
                 smsPromotion.setAdminId(adminId);
                 smsPromotion.setCategoryId(product.getCategoryId());
                 smsPromotion.setPayAmount(product.getPrice());
-                smsPromotion.setQuota(Math.toIntExact(quota));
+                smsPromotion.setQuota(quota != null ? quota : 0L);
                 smsPromotion.setStatus(1);
                 smsPromotion.setDays(Math.toIntExact(validDays));
                 smsPromotion.setPromotionType(packageId != null ? Math.toIntExact(packageId) : 0);
@@ -231,7 +231,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
             long usedQuota = admin.getUsedPromotionQuota() != null ? admin.getUsedPromotionQuota() : 0L;
             admin.setPromotionQuota(totalQuota - quota);
             admin.setUsedPromotionQuota(usedQuota + quota);
-            umsAdminService.save(admin);
+            umsAdminRepository.save(admin);
         }
 
         log.info("Promotion created successfully for items: {}", list);
@@ -250,7 +250,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
             return CommonResult.unauthorized("Authentication required");
         }
 
-        Optional<UmsAdmin> adminOpt = umsAdminService.findById(adminId);
+        Optional<UmsAdmin> adminOpt = umsAdminRepository.findById(adminId);
         if (adminOpt.isEmpty()) {
             return CommonResult.failed("Admin user not found");
         }
@@ -290,7 +290,7 @@ public class SmsPromotionServiceImpl implements SmsPromotionService {
 
                     admin.setPromotionQuota(currentQuota + totalCanRecoverQuota);
                     admin.setUsedPromotionQuota(usedQuota - totalCanRecoverQuota);
-                    umsAdminService.save(admin);
+                    umsAdminRepository.save(admin);
 
                     // record recovery log entry (negative quota represents refund)
                     SmsPromotionQuotaLog recoverLog = new SmsPromotionQuotaLog();

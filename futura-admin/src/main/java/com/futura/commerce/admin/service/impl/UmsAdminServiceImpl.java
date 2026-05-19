@@ -7,7 +7,7 @@ import com.futura.commerce.admin.service.CommonImageService;
 import com.futura.commerce.admin.service.SmsPromotionPackageService;
 import com.futura.commerce.admin.service.SmsPromotionRechargeService;
 import com.futura.commerce.admin.service.UmsAdminService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.*;
 import com.futura.commerce.mbg.repository.UmsAdminRepository;
 import com.futura.commerce.mbg.repository.UmsMenuRepository;

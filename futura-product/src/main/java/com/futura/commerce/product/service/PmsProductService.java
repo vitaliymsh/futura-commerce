@@ -3,7 +3,7 @@ package com.futura.commerce.product.service;
 import com.futura.commerce.product.dto.IsPromotionDTO;
 import com.futura.commerce.product.dto.PmsPromotionSearchDTO;
 import com.futura.commerce.product.dto.PmsPromotionVO;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;

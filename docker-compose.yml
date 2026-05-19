@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # 1. HashiCorp Consul Service Mesh & Registry
+  consul:
+    image: hashicorp/consul:1.16
+    container_name: futura-consul
+    restart: unless-stopped
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: "agent -dev -client=0.0.0.0"
+
+  # 2. Redis with RedisBloom module for click weights & recommendation deduplication
+  redis:
+    image: redislabs/rebloom:latest
+    container_name: futura-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  # 3. RabbitMQ message broker for async seckill order placement
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    container_name: futura-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  # 4. PostgreSQL / MySQL relational database
+  mysql:
+    image: mysql:8.0
+    container_name: futura-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mall
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # 5. Elasticsearch for high-speed product catalog search
+  elasticsearch:
+    image: elasticsearch:8.11.3
+    container_name: futura-elasticsearch
+    restart: unless-stopped
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"

@@ -13,10 +13,12 @@ import com.futura.commerce.product.service.PmsProductCategoryService;
 import com.futura.commerce.product.service.PmsProductFeatureService;
 import com.futura.commerce.product.service.PmsProductService;
 import com.futura.commerce.product.service.ProductParamsService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductCategory;
+import com.futura.commerce.mbg.model.PmsProductSku;
 import com.futura.commerce.mbg.repository.PmsProductRepository;
+import com.futura.commerce.product.dto.ProductSkuEsDoc;
 import jakarta.annotation.Resource;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +50,9 @@ public class PmsProductServiceImpl implements PmsProductService {
 
     @Resource
     private PmsProductRepository pmsProductRepository;
+
+    @Resource
+    private com.futura.commerce.mbg.repository.PmsProductSkuRepository pmsProductSkuRepository;
 
     @Lazy
     @Resource
@@ -290,32 +295,45 @@ public class PmsProductServiceImpl implements PmsProductService {
                 if (cached.trim().isEmpty()) {
                     return CommonResult.failed("Product does not exist");
                 }
-                log.info("Cache hit for product detail: {}", productId);
                 ProductDetailDTO cachedDto = objectMapper.readValue(cached, ProductDetailDTO.class);
-                return CommonResult.success(cachedDto, "Product detail retrieved successfully");
+                if (cachedDto != null && cachedDto.getProduct() != null) {
+                    log.info("Cache hit for product detail: {}", productId);
+                    return CommonResult.success(cachedDto, "Product detail retrieved successfully");
+                }
             }
         } catch (Exception e) {
             log.warn("Failed to retrieve product detail from cache: {}", e.getMessage());
         }
 
-        // Prevent cache penetration
+        // Direct product lookup
         Optional<PmsProduct> productOpt = pmsProductRepository.findById(productId);
+        Long targetProductId = productId;
+
+        // If not found directly, check if the ID belongs to a SKU variant
         if (productOpt.isEmpty()) {
-            try {
-                stringRedisTemplate.opsForValue().set(cacheKey, " ", 1, TimeUnit.MINUTES);
-            } catch (Exception e) {
-                log.warn("Failed to write empty product to cache: {}", e.getMessage());
+            Optional<PmsProductSku> skuOpt = pmsProductSkuRepository.findById(productId);
+            if (skuOpt.isPresent() && skuOpt.get().getProductId() != null) {
+                targetProductId = skuOpt.get().getProductId();
+                productOpt = pmsProductRepository.findById(targetProductId);
             }
+        }
+
+        if (productOpt.isEmpty()) {
             return CommonResult.failed("Product does not exist");
         }
 
-        List<PmsProductFeature> featureList = pmsProductFeatureService.findByProductId(productId);
-        List<ProductParams> paramsList = productParamsService.findByProductsId(productId);
+        PmsProduct product = productOpt.get();
+        List<PmsProductFeature> featureList = pmsProductFeatureService.findByProductId(targetProductId);
+        List<ProductParams> paramsList = productParamsService.findByProductsId(targetProductId);
+        List<PmsProductSku> skuList = pmsProductSkuRepository.findByProductId(targetProductId);
 
         if (featureList == null) featureList = new ArrayList<>();
         if (paramsList == null) paramsList = new ArrayList<>();
+        if (skuList == null) skuList = new ArrayList<>();
 
         ProductDetailDTO detailDTO = new ProductDetailDTO();
+        detailDTO.setProduct(product);
+        detailDTO.setSkuList(skuList);
         detailDTO.setParamsList(paramsList);
         detailDTO.setFeatureList(featureList);
 
@@ -427,6 +445,21 @@ public class PmsProductServiceImpl implements PmsProductService {
                 }
             } catch (Exception e) {
                 log.error("Failed to query fallback hot products from elasticsearch", e);
+            }
+        }
+
+        // DB Fallback if elasticsearch is empty or returned fewer than needed
+        if (resultList.isEmpty()) {
+            List<PmsProduct> dbProducts = pmsProductRepository.findAll();
+            for (PmsProduct p : dbProducts) {
+                ProductSkuEsDoc doc = new ProductSkuEsDoc();
+                doc.setProductId(p.getId());
+                doc.setName(p.getName());
+                doc.setPic(p.getPic());
+                doc.setCategoryId(p.getCategoryId() != null ? p.getCategoryId().longValue() : null);
+                doc.setPublishStatus(p.getPublishStatus());
+                doc.setPrice(p.getPrice() != null ? p.getPrice().doubleValue() : 0.0);
+                resultList.add(doc);
             }
         }
 

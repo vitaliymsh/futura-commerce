@@ -4,7 +4,7 @@ import com.futura.commerce.admin.service.SysTableColumnConfigService;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.SysTableColumnConfig;
 import com.futura.commerce.mbg.repository.SysTableColumnConfigRepository;
-import com.futura.commerce.security.domain.LoginUser;
+import com.futura.commerce.security.dto.LoginUser;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

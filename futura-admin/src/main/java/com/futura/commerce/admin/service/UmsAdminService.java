@@ -3,7 +3,7 @@ package com.futura.commerce.admin.service;
 import com.futura.commerce.admin.dto.UmsAdminRoleDTO;
 import com.futura.commerce.admin.dto.UmsAdminSaveDTO;
 import com.futura.commerce.admin.dto.UmsAdminVO;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.UmsAdmin;
 import org.springframework.web.multipart.MultipartFile;
 

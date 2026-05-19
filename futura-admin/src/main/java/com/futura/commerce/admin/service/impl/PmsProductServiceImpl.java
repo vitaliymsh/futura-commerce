@@ -6,7 +6,7 @@ import com.futura.commerce.admin.dto.PmsPromotionVO;
 import com.futura.commerce.admin.service.CommonImageService;
 import com.futura.commerce.admin.service.PmsProductCategoryService;
 import com.futura.commerce.admin.service.PmsProductService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductCategory;
 import com.futura.commerce.mbg.repository.PmsProductRepository;

@@ -1,7 +1,7 @@
 package com.futura.commerce.admin.controller;
 
 import com.futura.commerce.admin.service.PmsDataStatService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -30,7 +30,7 @@ public class DashboardController {
 
     @GetMapping("/stats")
     @Operation(summary = "Retrieve sales and performance metrics by date range")
-    @PreAuthorize("hasAuthority('dashboard:view')")
+    @PreAuthorize("hasRole('ADMIN') or hasAnyAuthority('user:manage','dashboard:view','admin:dashboard:view')")
     public CommonResult<Map<String, Object>> stat(
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate) {

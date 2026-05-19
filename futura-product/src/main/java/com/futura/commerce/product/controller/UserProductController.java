@@ -1,6 +1,6 @@
 package com.futura.commerce.product.controller;
 
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.product.dto.ProductDetailDTO;
 import com.futura.commerce.product.service.PmsProductService;
 import io.swagger.v3.oas.annotations.Operation;

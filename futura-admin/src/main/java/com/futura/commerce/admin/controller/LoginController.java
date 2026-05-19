@@ -1,7 +1,7 @@
 package com.futura.commerce.admin.controller;
 
 import com.futura.commerce.admin.service.UmsAdminService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.UmsAdmin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

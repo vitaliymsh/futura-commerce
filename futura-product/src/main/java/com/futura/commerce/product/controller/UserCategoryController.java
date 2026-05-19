@@ -1,6 +1,6 @@
 package com.futura.commerce.product.controller;
 
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.product.dto.CategoryNode;
 import com.futura.commerce.product.dto.ClickDTO;
 import com.futura.commerce.product.service.PmsProductCategoryService;

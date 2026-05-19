@@ -3,7 +3,7 @@ package com.futura.commerce.admin.service.impl;
 import com.futura.commerce.admin.dto.CategoryNode;
 import com.futura.commerce.admin.service.PmsProductCategoryService;
 import com.futura.commerce.admin.service.PmsProductService;
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProduct;
 import com.futura.commerce.mbg.model.PmsProductCategory;
 import com.futura.commerce.mbg.repository.PmsProductCategoryRepository;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Service implementation for managing PmsProductCategory
@@ -27,6 +28,9 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
 
     @Resource
     private PmsProductCategoryRepository pmsProductCategoryRepository;
+
+    @Resource
+    private com.futura.commerce.mbg.repository.PmsProductRepository pmsProductRepository;
 
     @Resource
     private PmsProductService productService;

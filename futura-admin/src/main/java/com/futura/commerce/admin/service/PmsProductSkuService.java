@@ -3,6 +3,8 @@ package com.futura.commerce.admin.service;
 import com.futura.commerce.admin.dto.PmsSkuSearchDTO;
 import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.PmsProductSku;
+import com.futura.commerce.mbg.model.PmsSkuPriceHistory;
+import com.futura.commerce.mbg.model.SysOperationLog;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 

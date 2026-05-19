@@ -1,6 +1,6 @@
 package com.futura.commerce.admin.service;
 
-import com.futura.commerce.common.baseCommon.CommonResult;
+import com.futura.commerce.common.api.CommonResult;
 import com.futura.commerce.mbg.model.SmsPromotionRecharge;
 
 import java.util.List;

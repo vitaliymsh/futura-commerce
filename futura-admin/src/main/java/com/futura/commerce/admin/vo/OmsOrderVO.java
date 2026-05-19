@@ -21,7 +21,8 @@ public class OmsOrderVO extends OmsOrder {
     private LocalDateTime signTime;
     private String deliveryNo;
 
-    private List<OrderItemVO> orderItemList;
+    private List<OrderItemVO> items;
+    private DeliveryVO delivery;
 
     @Data
     public static class OrderItemVO {
@@ -29,7 +30,19 @@ public class OmsOrderVO extends OmsOrder {
         private String pic;
         private String spec;
         private String productPrice;
-        private Integer productQuantity;
-        private String productPriceAmount;
+        private Integer quantity;
+        private String realAmount;
+    }
+
+    @Data
+    public static class DeliveryVO {
+        private String deliveryCompany;
+        private String deliveryNo;
+        private Integer deliveryStatus;
+        private LocalDateTime deliveryTime;
+        private LocalDateTime signTime;
+        private String receiverName;
+        private String receiverPhone;
+        private String receiverAddress;
     }
 }
