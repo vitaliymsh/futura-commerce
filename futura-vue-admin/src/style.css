@@ -1,0 +1,159 @@
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --bg-primary: #222222;
+  --bg-secondary: #282828;
+  --bg-card: #282828;
+  --bg-card-hover: #323232;
+  --bg-input: #333333;
+
+  --accent-yellow: #FFCC00;
+  --accent-yellow-hover: #E6B800;
+  --accent-green: #00B843;
+  --accent-green-bg: rgba(0, 184, 67, 0.15);
+  --accent-red: #F03838;
+  --accent-red-bg: rgba(240, 56, 56, 0.18);
+  --accent-blue: #2F80ED;
+  --accent-blue-bg: rgba(47, 128, 237, 0.15);
+  --accent-gold: #F5A623;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-card: rgba(255, 255, 255, 0.12);
+  --border-input: #444444;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #AAAAAA;
+  --text-muted: #777777;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #444444;
+  border-radius: var(--radius-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+.fintech-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s ease-in-out;
+}
+
+.fintech-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.fintech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.fintech-pill.emerald {
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+}
+
+.fintech-pill.blue {
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
+}
+
+.fintech-pill.amber {
+  background: rgba(255, 204, 0, 0.15);
+  color: var(--accent-yellow);
+}
+
+.fintech-pill.rose {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+}
+
+.metric-num {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' on, 'zero' on;
+}
+
+/* Element Plus Dark Theme Overrides */
+.el-table {
+  --el-table-bg-color: #282828 !important;
+  --el-table-tr-bg-color: #282828 !important;
+  --el-table-header-bg-color: #212121 !important;
+  --el-table-border-color: rgba(255, 255, 255, 0.08) !important;
+  --el-table-text-color: #ffffff !important;
+  --el-table-header-text-color: #aaaaaa !important;
+  --el-table-row-hover-bg-color: #323232 !important;
+}
+
+.el-dialog {
+  background-color: #282828 !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.el-dialog__title {
+  color: #ffffff !important;
+}
+
+.el-input__wrapper {
+  background-color: #333333 !important;
+  box-shadow: 0 0 0 1px var(--border-subtle) inset !important;
+}
+
+.el-input__inner {
+  color: #ffffff !important;
+}
+
+.el-button--primary {
+  --el-button-bg-color: var(--accent-yellow) !important;
+  --el-button-border-color: var(--accent-yellow) !important;
+  --el-button-hover-bg-color: var(--accent-yellow-hover) !important;
+  --el-button-hover-border-color: var(--accent-yellow-hover) !important;
+  --el-button-text-color: #000000 !important;
+  --el-button-hover-text-color: #000000 !important;
+  font-weight: 700 !important;
+}
