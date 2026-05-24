@@ -7,13 +7,14 @@ import com.futura.commerce.user.dto.LoginDTO;
 import com.futura.commerce.user.service.UmsUserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * Service implementation for customer user accounts using Spring Data JPA
+ * Service implementation for customer user accounts using Spring Data JPA and BCrypt password encryption
  *
  * @author Vitalii
  */
@@ -23,6 +24,8 @@ public class UmsUserServiceImpl implements UmsUserService {
 
     @Resource
     private UmsUserRepository userRepository;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public CommonResult<UmsUser> userLogin(LoginDTO userLogin) {
@@ -38,12 +41,15 @@ public class UmsUserServiceImpl implements UmsUserService {
             user.setPhone(userLogin.getPhone());
             user.setUsername(userLogin.getPhone());
             user.setNickname("user_" + userLogin.getPhone().substring(Math.max(0, userLogin.getPhone().length() - 4)));
-            user.setPassword(userLogin.getPassword());
+            user.setPassword(passwordEncoder.encode(userLogin.getPassword()));
             user.setCreateTime(LocalDateTime.now());
             user = userRepository.save(user);
         } else {
             user = userOpt.get();
-            if (!user.getPassword().equals(userLogin.getPassword())) {
+            // Verify using BCrypt or allow plain-text fallback for backward compatibility
+            boolean passwordMatches = passwordEncoder.matches(userLogin.getPassword(), user.getPassword())
+                    || user.getPassword().equals(userLogin.getPassword());
+            if (!passwordMatches) {
                 return CommonResult.failed("Invalid password");
             }
         }

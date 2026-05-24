@@ -102,6 +102,7 @@ public class SmsSeckillServiceImpl implements SmsSeckillService {
         return CommonResult.success(new PageImpl<>(pageContent, pageable, total), "Fetched flash sale list successfully");
     }
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<com.futura.commerce.admin.dto.SmsSeckillUpdateDTO> skillEdit(Long id, com.futura.commerce.admin.dto.SmsSeckillUpdateDTO dto) {
         try {
@@ -164,6 +165,7 @@ public class SmsSeckillServiceImpl implements SmsSeckillService {
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<String> skillDelete(Long id) {
         try {
@@ -183,6 +185,7 @@ public class SmsSeckillServiceImpl implements SmsSeckillService {
         }
     }
 
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     @Override
     public CommonResult<String> skillDeleteBatch(Long[] ids) {
         try {
