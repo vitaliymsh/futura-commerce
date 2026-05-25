@@ -19,22 +19,39 @@ import java.util.Map;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secret:futura-default-secret-key-for-jwt-token-generation-2026-very-secure}")
     private String secret;
 
-    @Value("${jwt.expiration}")
+    @Value("${jwt.expiration:86400000}")
     private Long expiration;
 
-    @Value("${jwt.tokenHeader}")
+    @Value("${jwt.tokenHeader:Authorization}")
     private String tokenHeader;
 
     /**
      * Generate JWT token from user authentication details
      */
+    /**
+     * Generate JWT token from plain username string
+     */
+    public String generateTokenFromUsername(String username) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, username);
+    }
+
     public String generateToken(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
+    }
+
+    private byte[] getSigningKeyBytes() {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            return md.digest(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            return secret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        }
     }
 
     /**
@@ -48,7 +65,7 @@ public class JwtTokenUtil {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(SignatureAlgorithm.HS256, getSigningKeyBytes())
                 .compact();
     }
 
@@ -58,7 +75,7 @@ public class JwtTokenUtil {
     public String getUsernameFromToken(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(getSigningKeyBytes())
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -73,7 +90,7 @@ public class JwtTokenUtil {
     public boolean isTokenExpired(String token) {
         try {
             Date expireDate = Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(getSigningKeyBytes())
                     .parseClaimsJws(token)
                     .getBody()
                     .getExpiration();
@@ -99,7 +116,7 @@ public class JwtTokenUtil {
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(getSigningKeyBytes())
                     .parseClaimsJws(token);
             return true;
         } catch (Exception e) {

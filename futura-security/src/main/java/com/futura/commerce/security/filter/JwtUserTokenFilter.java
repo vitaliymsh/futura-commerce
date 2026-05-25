@@ -1,6 +1,7 @@
 package com.futura.commerce.security.filter;
 
 import com.futura.commerce.security.service.impl.AdminUserDetailsService;
+import com.futura.commerce.security.service.impl.UserDetailService;
 import com.futura.commerce.security.util.JwtTokenUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -11,12 +12,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * JWT authentication filter inspecting bearer token header
+ * JWT authentication filter inspecting bearer token header and establishing security context
  *
  * @author Vitalii
  */
@@ -29,35 +33,83 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
     @Resource
     private AdminUserDetailsService adminUserDetailsService;
 
+    @Resource
+    private UserDetailService userDetailService;
+
+    private static final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    private static final List<String> WHITE_LIST = Arrays.asList(
+            "/auth/**",
+            "/user/auth/**",
+            "/user/login",
+            "/user/register",
+            "/api/user/auth/**",
+            "/actuator/health",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/pic/**",
+            "/user/**",
+            "/Pms_promotion/**",
+            "/goods/**",
+            "/dashboard/**",
+            "/Sku/**",
+            "/promotion/**",
+            "/user/comment/**",
+            "/user/upload/**",
+            "/user/item/**",
+            "/order/**",
+            "/delivery/**",
+            "/deliveryTrace/**",
+            "/item/**",
+            "/ai/**",
+            "/skill/**",
+            "/activity/**",
+            "/coupon/**",
+            "/api/user/cart/**",
+            "/api/user/category/**",
+            "/api/user/product/**",
+            "/api/user/comment/**",
+            "/api/user/upload/**",
+            "/api/user/item/**",
+            "/api/user/order/**",
+            "/api/user/coupon/**",
+            "/api/user/skill/**"
+    );
+
+
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // 1. extract bearer token from header
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 2. validate token bearer
         String token = authHeader.substring(7);
-        if (!jwtTokenUtil.validateToken(token)) {
+        if (token.isEmpty() || !jwtTokenUtil.validateToken(token)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 3. fetch user details and authorities from principal
         UserDetails userDetails;
         String username = jwtTokenUtil.getUsernameFromToken(token);
         try {
-            userDetails = adminUserDetailsService.loadUserByUsername(username);
+            String uri = request.getRequestURI();
+            if (uri.startsWith("/user") || uri.startsWith("/api/user")) {
+                userDetails = userDetailService.loadUserByUsername(username);
+            } else {
+                userDetails = adminUserDetailsService.loadUserByUsername(username);
+            }
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 4. assemble authentication token and establish security context
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         userDetails,
@@ -67,13 +119,11 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        // 5. auto-refresh token and attach to response header
         String newToken = jwtTokenUtil.refreshToken(token);
         if (newToken != null) {
             response.setHeader("Authorization", "Bearer " + newToken);
         }
 
-        // 6. continue filter chain
         filterChain.doFilter(request, response);
     }
 }

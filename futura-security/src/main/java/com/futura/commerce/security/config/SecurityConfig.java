@@ -50,19 +50,22 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 3. route permission rules
                 .authorizeHttpRequests(auth -> auth
-                        // allow login endpoint
-                        .requestMatchers("/auth/login").permitAll()
+                        // allow login and registration endpoints
+                        .requestMatchers("/auth/**", "/user/auth/**", "/user/login", "/user/register", "/api/user/auth/**").permitAll()
                         // allow static image / avatar access
                         .requestMatchers("/pic/**").permitAll()
                         // allow swagger api documentation and webjars
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/webjars/**").permitAll()
+                        // allow customer browsing and storefront read endpoints
+                        .requestMatchers("/user/**", "/api/user/**").permitAll()
                         // allow internal microservice endpoints
                         .requestMatchers("/Pms_promotion/**", "/Oms_order/**", "/Oms_delivery/**", "/Oms_deliveryTrace/**", "/Oms_item/**",
                                 "/Sms_seckill/**", "/Sms_skill/**", "/Sms_activity/**",
                                 "/goodList", "/goodsPagination", "/search", "/selectSku",
                                 "/goods/categories/**", "/goods/**", "/Sku/**", "/dashboard/**",
                                 "/order/**", "/delivery/**", "/deliveryTrace/**", "/item/**",
-                                "/promotion/**", "/skill/**", "/activity/**").permitAll()
+                                "/after/**", "/review/**",
+                                "/promotion/**", "/skill/**", "/activity/**", "/ai/**").permitAll()
                         // all other endpoints require authentication
                         .anyRequest().authenticated())
                 // 4. register jwt filter
