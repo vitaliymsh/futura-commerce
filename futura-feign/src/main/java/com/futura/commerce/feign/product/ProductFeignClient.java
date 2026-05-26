@@ -19,6 +19,12 @@ public interface ProductFeignClient {
     @GetMapping("/user/product/detail")
     CommonResult<?> detail(@RequestParam("id") Long productId);
 
+    @GetMapping("/user/category/list")
+    CommonResult<?> productCategoryList();
+
+    @PostMapping("/user/category/click/report")
+    CommonResult<?> productClickReport(@RequestBody Object clickDTO);
+
     @GetMapping("/Pms_promotion/goodList")
     CommonResult<?> goodsList();
 

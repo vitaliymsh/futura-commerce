@@ -29,4 +29,6 @@ public interface PmsProductCategoryService {
     CommonResult<String> updateCategory(Long id, PmsProductCategory category);
 
     CommonResult<String> deleteCategory(Long id);
+
+    CommonResult<String> productClickReport(com.futura.commerce.product.dto.ClickDTO clickDTO);
 }

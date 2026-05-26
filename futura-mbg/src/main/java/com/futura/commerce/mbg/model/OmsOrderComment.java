@@ -53,6 +53,11 @@ public class OmsOrderComment implements Serializable {
     private Integer score;
 
     /**
+     * Comment type
+     */
+    private Integer type;
+
+    /**
      * Comment time
      */
     private LocalDateTime commentTime;

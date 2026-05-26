@@ -20,6 +20,9 @@ public interface OrderFeignClient {
     @GetMapping("/item/getByOrderNo")
     AiOrderProductDto getByOrderNo(@RequestParam("orderNo") String orderNo);
 
+    @GetMapping("/user/comment/{productId}")
+    CommonResult<?> orderComment(@PathVariable("productId") Long productId);
+
     @GetMapping("/order/detail/{id}")
     CommonResult<?> orderDetail(@PathVariable Long id);
 

@@ -15,4 +15,5 @@ public interface OmsOrderCommentService {
     List<OmsOrderComment> findByProductId(Long productId);
     Optional<OmsOrderComment> findById(Long id);
     OmsOrderComment save(OmsOrderComment comment);
+    com.futura.commerce.common.api.CommonResult<List<com.futura.commerce.order.dto.OrderCommentDTO>> orderComment(Long productId);
 }

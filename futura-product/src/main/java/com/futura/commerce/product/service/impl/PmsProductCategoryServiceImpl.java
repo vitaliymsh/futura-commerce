@@ -1,6 +1,8 @@
 package com.futura.commerce.product.service.impl;
 
+import com.futura.commerce.product.config.RedisKey;
 import com.futura.commerce.product.dto.CategoryNode;
+import com.futura.commerce.product.dto.ClickDTO;
 import com.futura.commerce.product.service.PmsProductCategoryService;
 import com.futura.commerce.product.service.PmsProductService;
 import com.futura.commerce.common.baseCommon.CommonResult;
@@ -9,12 +11,10 @@ import com.futura.commerce.mbg.model.PmsProductCategory;
 import com.futura.commerce.mbg.repository.PmsProductCategoryRepository;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Service implementation for managing PmsProductCategory
@@ -30,6 +30,9 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
 
     @Resource
     private PmsProductService productService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @Override
     public List<PmsProductCategory> findAll() {
@@ -175,5 +178,58 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
         }
 
         return rootList;
+    }
+
+    @Override
+    public CommonResult<String> productClickReport(ClickDTO clickDTO) {
+        if (clickDTO == null || clickDTO.getUserId() == null) {
+            return CommonResult.failed("Invalid user click report payload");
+        }
+        Long userId = clickDTO.getUserId();
+        log.info("Starting user product click report for userId: {}", userId);
+
+        List<ClickDTO.Click> clickList = clickDTO.getClickList();
+        if (clickList == null || clickList.isEmpty()) {
+            return CommonResult.success("No click data provided, reporting finished");
+        }
+
+        Map<Long, Integer> countMap = new HashMap<>();
+        Map<Long, Long> lastTimeMap = new HashMap<>();
+
+        for (ClickDTO.Click click : clickList) {
+            Long categoryId = click.getCategoryId();
+            if (categoryId == null) continue;
+
+            countMap.put(categoryId, countMap.getOrDefault(categoryId, 0) + 1);
+
+            if (click.getClickTime() != null) {
+                try {
+                    long clickTime = Long.parseLong(click.getClickTime());
+                    lastTimeMap.put(categoryId, clickTime);
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid clickTime format: {}", click.getClickTime());
+                }
+            }
+        }
+
+        List<Map.Entry<Long, Integer>> list = new ArrayList<>(countMap.entrySet());
+        list.sort((o1, o2) -> {
+            int countComp = o2.getValue().compareTo(o1.getValue());
+            if (countComp != 0) {
+                return countComp;
+            }
+            Long t1 = lastTimeMap.getOrDefault(o1.getKey(), 0L);
+            Long t2 = lastTimeMap.getOrDefault(o2.getKey(), 0L);
+            return t2.compareTo(t1);
+        });
+
+        String key = RedisKey.USER_BEHAVIOR.getKey(userId);
+        for (Map.Entry<Long, Integer> entry : countMap.entrySet()) {
+            Long categoryId = entry.getKey();
+            Integer count = entry.getValue();
+            stringRedisTemplate.opsForHash().increment(key, String.valueOf(categoryId), count);
+        }
+
+        return CommonResult.success("User category click interest recorded successfully");
     }
 }

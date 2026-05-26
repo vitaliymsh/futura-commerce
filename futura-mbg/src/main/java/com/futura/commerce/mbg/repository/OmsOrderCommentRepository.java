@@ -15,5 +15,6 @@ import java.util.List;
 public interface OmsOrderCommentRepository extends JpaRepository<OmsOrderComment, Long> {
     List<OmsOrderComment> findByOrderId(Long orderId);
     List<OmsOrderComment> findByProductId(Long productId);
+    List<OmsOrderComment> findByProductIdOrderByCommentTimeDesc(Long productId);
     List<OmsOrderComment> findByUserId(Long userId);
 }
