@@ -31,4 +31,12 @@ public class UserProductController {
     public CommonResult<ProductDetailDTO> detail(@RequestParam("id") Long productId) {
         return pmsProductService.detail(productId);
     }
+
+    @GetMapping("/recommend")
+    @Operation(summary = "Personalized recommendations", description = "Personalized product recommendations based on browsing history and Bloom filter")
+    public CommonResult<org.springframework.data.domain.Page<com.futura.commerce.product.dto.ProductSkuEsDoc>> productRecommend(
+            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return pmsProductService.productRecommend(pageNum, pageSize);
+    }
 }

@@ -6,7 +6,9 @@ package com.futura.commerce.product.config;
  * @author Vitalii
  */
 public enum RedisKey {
-    USER_BEHAVIOR("user:behavior:%s", 3600 * 24 * 7);
+    USER_BEHAVIOR("user:behavior:%s", 3600 * 24 * 7),
+    USER_CATEGORY("user:category:%s", 3600 * 24 * 7),
+    USER_VIEW_BLOOM("bloom:user:view:%s", 3600 * 24 * 7);
 
     private final String key;
     private final long expire;

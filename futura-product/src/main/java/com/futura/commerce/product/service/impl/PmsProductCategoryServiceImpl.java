@@ -34,6 +34,9 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
+    @Resource
+    private com.futura.commerce.product.util.RedisBloomHelper redisBloomHelper;
+
     @Override
     public List<PmsProductCategory> findAll() {
         return pmsProductCategoryRepository.findAll();
@@ -224,10 +227,18 @@ public class PmsProductCategoryServiceImpl implements PmsProductCategoryService 
         });
 
         String key = RedisKey.USER_BEHAVIOR.getKey(userId);
-        for (Map.Entry<Long, Integer> entry : countMap.entrySet()) {
+        for (Map.Entry<Long, Integer> entry : list) {
             Long categoryId = entry.getKey();
             Integer count = entry.getValue();
             stringRedisTemplate.opsForHash().increment(key, String.valueOf(categoryId), count);
+        }
+
+        String bloomKey = RedisKey.USER_VIEW_BLOOM.getKey(userId);
+        for (ClickDTO.Click click : clickList) {
+            Long productId = click.getProductId();
+            if (productId != null) {
+                redisBloomHelper.add(bloomKey, productId.toString());
+            }
         }
 
         return CommonResult.success("User category click interest recorded successfully");

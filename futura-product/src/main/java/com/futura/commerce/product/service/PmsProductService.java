@@ -45,4 +45,6 @@ public interface PmsProductService {
     CommonResult<String> updateProduct(Long id, PmsPromotionSearchDTO promotion);
 
     CommonResult<com.futura.commerce.product.dto.ProductDetailDTO> detail(Long productId);
+
+    CommonResult<Page<com.futura.commerce.product.dto.ProductSkuEsDoc>> productRecommend(Integer pageNum, Integer pageSize);
 }

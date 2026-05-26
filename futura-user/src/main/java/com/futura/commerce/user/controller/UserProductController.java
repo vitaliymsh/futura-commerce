@@ -28,4 +28,11 @@ public class UserProductController {
     public CommonResult<?> detail(@RequestParam("id") Long productId) {
         return productFeignClient.detail(productId);
     }
+
+    @GetMapping("/recommend")
+    @Operation(summary = "Product recommendations", description = "Retrieve personalized product recommendations")
+    public CommonResult<?> recommend(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                     @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return productFeignClient.productRecommend(pageNum, pageSize);
+    }
 }

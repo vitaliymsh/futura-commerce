@@ -66,6 +66,12 @@ public class PmsProductServiceImpl implements PmsProductService {
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
+    private com.futura.commerce.product.util.RedisBloomHelper redisBloomHelper;
+
+    @Resource
+    private co.elastic.clients.elasticsearch.ElasticsearchClient elasticsearchClient;
+
+    @Resource
     private ObjectMapper objectMapper;
 
     private static final String USER_DETAIL_KEY = "product:detail:";
@@ -322,5 +328,123 @@ public class PmsProductServiceImpl implements PmsProductService {
 
         log.info("Cache miss for product detail: {}", productId);
         return CommonResult.success(detailDTO, "Product detail retrieved successfully");
+    }
+
+    @Override
+    public CommonResult<Page<com.futura.commerce.product.dto.ProductSkuEsDoc>> productRecommend(Integer pageNum, Integer pageSize) {
+        Long userId = com.futura.commerce.common.util.UserUtil.getUserId();
+        if (userId == null) {
+            userId = 1107L;
+        }
+
+        List<com.futura.commerce.product.dto.ProductSkuEsDoc> resultList = new ArrayList<>();
+        java.util.Set<Long> existIds = new java.util.HashSet<>();
+
+        String bloomKey = com.futura.commerce.product.config.RedisKey.USER_VIEW_BLOOM.getKey(userId);
+        String hashKey = com.futura.commerce.product.config.RedisKey.USER_BEHAVIOR.getKey(userId);
+
+        java.util.Map<Object, Object> entries = stringRedisTemplate.opsForHash().entries(hashKey);
+
+        for (java.util.Map.Entry<Object, Object> entry : entries.entrySet()) {
+            String categoryIdStr = (String) entry.getKey();
+            if (categoryIdStr == null || !categoryIdStr.matches("\\d+")) {
+                continue;
+            }
+
+            Long categoryId;
+            try {
+                categoryId = Long.valueOf(categoryIdStr);
+            } catch (NumberFormatException e) {
+                continue;
+            }
+
+            co.elastic.clients.elasticsearch.core.SearchRequest req = co.elastic.clients.elasticsearch.core.SearchRequest.of(s -> s
+                    .index("pms_product")
+                    .query(q -> q.term(t -> t.field("categoryId").value(categoryId)))
+                    .size(100)
+            );
+
+            try {
+                co.elastic.clients.elasticsearch.core.SearchResponse<com.futura.commerce.product.dto.ProductSkuEsDoc> resp =
+                        elasticsearchClient.search(req, com.futura.commerce.product.dto.ProductSkuEsDoc.class);
+                List<com.futura.commerce.product.dto.ProductSkuEsDoc> list = resp.hits().hits().stream()
+                        .map(co.elastic.clients.elasticsearch.core.search.Hit::source)
+                        .filter(java.util.Objects::nonNull)
+                        .toList();
+
+                for (com.futura.commerce.product.dto.ProductSkuEsDoc doc : list) {
+                    Long productId = doc.getProductId();
+                    if (productId == null) continue;
+
+                    boolean isClicked = redisBloomHelper.exists(bloomKey, productId.toString());
+                    if (isClicked) {
+                        continue;
+                    }
+
+                    if (!existIds.contains(productId)) {
+                        resultList.add(doc);
+                        existIds.add(productId);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to query products for category {}", categoryIdStr, e);
+            }
+        }
+
+        int totalNeed = (pageNum != null && pageSize != null) ? pageNum * pageSize : 10;
+        if (resultList.size() < totalNeed) {
+            int need = totalNeed - resultList.size();
+            log.info("Current recommendations: {}, fetching additional hot products: {}", resultList.size(), need);
+            co.elastic.clients.elasticsearch.core.SearchRequest hotReq = co.elastic.clients.elasticsearch.core.SearchRequest.of(s -> s
+                    .index("pms_product")
+                    .query(q -> q.matchAll(m -> m))
+                    .sort(s2 -> s2.field(f -> f.field("_doc").order(co.elastic.clients.elasticsearch._types.SortOrder.Desc)))
+                    .size(need)
+            );
+            try {
+                co.elastic.clients.elasticsearch.core.SearchResponse<com.futura.commerce.product.dto.ProductSkuEsDoc> hotResp =
+                        elasticsearchClient.search(hotReq, com.futura.commerce.product.dto.ProductSkuEsDoc.class);
+                List<com.futura.commerce.product.dto.ProductSkuEsDoc> hotList = hotResp.hits().hits().stream()
+                        .map(co.elastic.clients.elasticsearch.core.search.Hit::source)
+                        .filter(java.util.Objects::nonNull)
+                        .toList();
+                for (com.futura.commerce.product.dto.ProductSkuEsDoc doc : hotList) {
+                    Long productId = doc.getProductId();
+                    if (productId == null) continue;
+
+                    boolean isClicked = redisBloomHelper.exists(bloomKey, productId.toString());
+                    if (isClicked) {
+                        continue;
+                    }
+
+                    if (!existIds.contains(productId)) {
+                        resultList.add(doc);
+                        existIds.add(productId);
+                        if (resultList.size() >= totalNeed) {
+                            break;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to query fallback hot products from elasticsearch", e);
+            }
+        }
+
+        int current = (pageNum == null || pageNum < 1) ? 1 : pageNum;
+        int size = (pageSize == null || pageSize < 1) ? 10 : pageSize;
+        int total = resultList.size();
+        int fromIndex = (current - 1) * size;
+        List<com.futura.commerce.product.dto.ProductSkuEsDoc> pageData;
+        if (fromIndex >= total) {
+            pageData = java.util.Collections.emptyList();
+        } else {
+            int toIndex = Math.min(fromIndex + size, total);
+            pageData = resultList.subList(fromIndex, toIndex);
+        }
+
+        Pageable pageable = PageRequest.of(current - 1, size);
+        Page<com.futura.commerce.product.dto.ProductSkuEsDoc> pageResult = new PageImpl<>(pageData, pageable, total);
+
+        return CommonResult.success(pageResult, "Personalized recommendations retrieved successfully");
     }
 }
