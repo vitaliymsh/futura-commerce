@@ -16,4 +16,5 @@ public interface OmsOrderCommentService {
     Optional<OmsOrderComment> findById(Long id);
     OmsOrderComment save(OmsOrderComment comment);
     com.futura.commerce.common.api.CommonResult<List<com.futura.commerce.order.dto.OrderCommentDTO>> orderComment(Long productId);
+    com.futura.commerce.common.api.CommonResult<org.springframework.data.domain.Page<com.futura.commerce.order.dto.AdminCommentDTO>> adminCommentList(Integer page, Integer pageSize);
 }

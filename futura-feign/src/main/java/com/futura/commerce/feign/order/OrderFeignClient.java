@@ -23,6 +23,10 @@ public interface OrderFeignClient {
     @GetMapping("/user/comment/{productId}")
     CommonResult<?> orderComment(@PathVariable("productId") Long productId);
 
+    @GetMapping("/review/list")
+    CommonResult<?> reviewList(@RequestParam("page") Integer page,
+                               @RequestParam("pageSize") Integer pageSize);
+
     @GetMapping("/order/detail/{id}")
     CommonResult<?> orderDetail(@PathVariable Long id);
 
