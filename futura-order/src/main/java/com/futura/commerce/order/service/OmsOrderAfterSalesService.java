@@ -14,4 +14,5 @@ public interface OmsOrderAfterSalesService {
     List<OmsOrderAfterSales> findByOrderId(Long orderId);
     Optional<OmsOrderAfterSales> findById(Long id);
     OmsOrderAfterSales save(OmsOrderAfterSales afterSales);
+    com.futura.commerce.common.api.CommonResult<org.springframework.data.domain.Page<com.futura.commerce.order.dto.AfterOrderDTO>> orderAfterList(Integer page, Integer pageSize);
 }

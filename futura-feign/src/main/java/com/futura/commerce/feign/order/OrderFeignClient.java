@@ -27,6 +27,10 @@ public interface OrderFeignClient {
     CommonResult<?> reviewList(@RequestParam("page") Integer page,
                                @RequestParam("pageSize") Integer pageSize);
 
+    @GetMapping("/after/list")
+    CommonResult<?> orderAfterList(@RequestParam("page") Integer page,
+                                   @RequestParam("pageSize") Integer pageSize);
+
     @GetMapping("/order/detail/{id}")
     CommonResult<?> orderDetail(@PathVariable Long id);
 

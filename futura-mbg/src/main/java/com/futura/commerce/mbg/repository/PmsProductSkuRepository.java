@@ -21,6 +21,8 @@ public interface PmsProductSkuRepository extends JpaRepository<PmsProductSku, Lo
 
     List<PmsProductSku> findByProductId(Long productId);
 
+    List<PmsProductSku> findByIdIn(java.util.Collection<Long> ids);
+
     Page<PmsProductSku> findByDeletedSku(Integer deletedSku, Pageable pageable);
 
     void deleteByProductId(Long productId);
